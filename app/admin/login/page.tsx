@@ -14,7 +14,12 @@ export default function AdminLoginPage() {
     setError("");
     setLoading(true);
     try {
-      const response = await fetch("/api/admin/login", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ email, password }) });
+      const response = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        credentials: "same-origin",
+        body: JSON.stringify({ email, password }),
+      });
       const raw = await response.text();
       let result: { error?: string };
       try {
@@ -23,7 +28,7 @@ export default function AdminLoginPage() {
         throw new Error(`O servidor não retornou uma resposta válida (${response.status}).`);
       }
       if (!response.ok) throw new Error(result.error ?? "Não foi possível entrar.");
-      window.location.href = "/admin";
+      window.location.replace("/admin");
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : "Não foi possível entrar.");
       setLoading(false);
@@ -32,7 +37,16 @@ export default function AdminLoginPage() {
 
   return (
     <main className="cms-login-page">
-      <div className="cms-login-brand"><Link href="/"><img src="/campaign/logo-transparent-dark.png" alt="Claudia Benassuly" /></Link><span>Central de conteúdo da campanha</span></div>
+      <div className="cms-login-brand">
+        <Link href="/" aria-label="Voltar para a campanha Claudia Benassuly">
+          <img src="/campaign/logo-slogan-dark.png" alt="Claudia Benassuly — Deputada Federal — Por ela. Por nós. Por todas." />
+        </Link>
+        <div className="cms-login-brand-copy">
+          <strong>Central de conteúdo da campanha</strong>
+          <span>Gestão editorial · agenda · notícias · santinho digital</span>
+        </div>
+      </div>
+
       <section className="cms-login-card">
         <p className="eyebrow">Área restrita</p>
         <h1>Entrar no <em>painel.</em></h1>
