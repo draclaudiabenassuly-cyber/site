@@ -10,6 +10,10 @@ declare global {
   }
 }
 
+const vlibrasRootAttrs: Record<string, string> = { vw: "" };
+const vlibrasButtonAttrs: Record<string, string> = { "vw-access-button": "" };
+const vlibrasWrapperAttrs: Record<string, string> = { "vw-plugin-wrapper": "" };
+
 export default function VlibrasWidget() {
   useEffect(() => {
     const pinPanel = () => {
@@ -46,9 +50,9 @@ export default function VlibrasWidget() {
   }, []);
 
   return (
-    <div vw="" className="enabled vlibras-widget" aria-label="Acessibilidade em Libras">
-      <div vw-access-button="" className="active" />
-      <div vw-plugin-wrapper="">
+    <div {...vlibrasRootAttrs} className="enabled vlibras-widget" aria-label="Acessibilidade em Libras">
+      <div {...vlibrasButtonAttrs} className="active" />
+      <div {...vlibrasWrapperAttrs}>
         <div className="vw-plugin-top-wrapper" />
       </div>
     </div>
