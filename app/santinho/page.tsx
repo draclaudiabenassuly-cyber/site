@@ -56,27 +56,85 @@ export default function SantinhoPage() {
     <main className="card-page">
       <style>{`
         @media print {
-          html, body, body.printing-santinho, body.printing-santinho .card-page,
-          body.printing-santinho .printable-santinho,
-          body.printing-santinho .digital-card-main,
-          body.printing-santinho .digital-card-content,
-          body.printing-santinho .digital-card-copy-large,
-          body.printing-santinho .digital-card-photo,
-          body.printing-santinho .digital-card-topline,
-          body.printing-santinho .digital-card-bottom,
-          body.printing-santinho .card-page-note {
+          @page {
+            size: A4 landscape;
+            margin: 0;
+          }
+
+          html,
+          body {
+            width: 297mm !important;
+            height: 210mm !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            background: #fff !important;
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
           }
 
-          body.printing-santinho .printable-santinho {
+          body.printing-santinho {
+            overflow: hidden !important;
+          }
+
+          /* Na impressão existe somente a arte. Header, textos, botões,
+             rodapé, links e o VLibras ficam fora do documento impresso. */
+          body.printing-santinho .card-page > * {
+            display: none !important;
+          }
+
+          body.printing-santinho .card-page > .printable-santinho {
+            display: block !important;
+          }
+
+          body.printing-santinho .printable-santinho,
+          body.printing-santinho .printable-santinho * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+
+          body.printing-santinho .card-page {
+            width: 297mm !important;
+            min-height: 210mm !important;
+            height: 210mm !important;
+            margin: 0 !important;
+            padding: 0 !important;
             background: #fff !important;
-            color: #fff !important;
+            overflow: hidden !important;
+          }
+
+          body.printing-santinho .printable-santinho {
+            width: 297mm !important;
+            max-width: 297mm !important;
+            height: auto !important;
+            min-height: 0 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            box-shadow: none !important;
+            border: 0 !important;
+            overflow: hidden !important;
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
           }
 
           body.printing-santinho .printable-santinho .digital-card-main {
+            width: 100% !important;
             background: #071d4f !important;
             color: #fff !important;
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+          }
+
+          body.printing-santinho .printable-santinho .digital-card-content {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+          }
+
+          body.printing-santinho .printable-santinho .digital-card-copy-large,
+          body.printing-santinho .printable-santinho .digital-card-photo,
+          body.printing-santinho .printable-santinho .digital-card-topline,
+          body.printing-santinho .printable-santinho .digital-card-bottom {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
           }
 
           body.printing-santinho .printable-santinho .digital-card-copy-large {
@@ -86,6 +144,15 @@ export default function SantinhoPage() {
 
           body.printing-santinho .printable-santinho .digital-card-photo {
             background: #9fc8d3 !important;
+          }
+
+          body.printing-santinho .printable-santinho .digital-card-photo img {
+            display: block !important;
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
           }
 
           body.printing-santinho .printable-santinho .digital-card-topline,
@@ -107,23 +174,61 @@ export default function SantinhoPage() {
             color: #b8c8df !important;
           }
 
-          body.printing-santinho .printable-santinho .party-card-lockup span,
-          body.printing-santinho .printable-santinho .santinho-coalition-label,
-          body.printing-santinho .printable-santinho .santinho-coalition-list > span {
+          /* A área da coligação não pode desaparecer nem quebrar entre páginas. */
+          body.printing-santinho .printable-santinho .santinho-coalition {
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            color: #d4deed !important;
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+          }
+
+          body.printing-santinho .printable-santinho .santinho-coalition-label {
+            display: block !important;
             color: #8fa5c4 !important;
           }
 
-          body.printing-santinho .printable-santinho .santinho-coalition-list b {
+          body.printing-santinho .printable-santinho .santinho-coalition-list {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr !important;
+            gap: 4px 12px !important;
             color: #d4deed !important;
           }
 
+          body.printing-santinho .printable-santinho .santinho-coalition-list > span {
+            display: block !important;
+            color: #8fa5c4 !important;
+            white-space: normal !important;
+          }
+
+          body.printing-santinho .printable-santinho .santinho-coalition-list b {
+            color: #fff !important;
+          }
+
           body.printing-santinho .printable-santinho .santinho-coalition-parties {
+            display: block !important;
             color: #7189ad !important;
           }
 
           body.printing-santinho .printable-santinho .card-page-note {
+            display: flex !important;
             background: #f0c64f !important;
             color: #071d4f !important;
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+          }
+
+          /* Segurança adicional: qualquer widget do VLibras injetado pelo script
+             também fica invisível no PDF/impressão. */
+          body.printing-santinho .vlibras-widget,
+          body.printing-santinho [vw],
+          body.printing-santinho [vw-access-button],
+          body.printing-santinho [vw-plugin-wrapper],
+          body.printing-santinho .vpw-container,
+          body.printing-santinho .vpw-wrapper {
+            display: none !important;
+            visibility: hidden !important;
           }
         }
       `}</style>
