@@ -1,0 +1,282 @@
+"use client";
+
+import { FormEvent, useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { defaultContent, type AgendaItem, type NewsItem, type SiteContent } from "../../lib/cms-defaults";
+
+type CmsPayload = { content: SiteContent; agenda: AgendaItem[]; news: NewsItem[]; isAdmin?: boolean; adminEmail?: string | null };
+type Tab = "overview" | "content" | "agenda" | "news";
+
+const contentFields: Array<{ key: keyof SiteContent; label: string; area?: boolean }> = [
+  { key: "heroEyebrow", label: "Chamada superior da home" },
+  { key: "heroTitle", label: "Título principal" },
+  { key: "heroTitleEm", label: "Palavra destacada do título" },
+  { key: "heroSubline", label: "Subtítulo principal" },
+  { key: "heroLede", label: "Texto de apresentação", area: true },
+  { key: "slogan", label: "Slogan da campanha" },
+  { key: "manifestoWords", label: "Palavras da faixa manifesto" },
+  { key: "storyEyebrow", label: "Chamada da história" },
+  { key: "storyTitle", label: "Título da história" },
+  { key: "storyTitleEm", label: "Destaque do título da história" },
+  { key: "storyLead", label: "Abertura da história", area: true },
+  { key: "storyBody", label: "Texto da história", area: true },
+  { key: "quote", label: "Frase do manifesto" },
+  { key: "quoteEm", label: "Destaque da frase" },
+  { key: "quoteDescription", label: "Texto de apoio do manifesto", area: true },
+  { key: "santinhoEyebrow", label: "Chamada da seção santinho" },
+  { key: "santinhoTitle", label: "Título do santinho" },
+  { key: "santinhoTitleEm", label: "Destaque do título do santinho" },
+  { key: "santinhoDescription", label: "Descrição do santinho", area: true },
+  { key: "santinhoKicker", label: "Frase no santinho" },
+  { key: "santinhoBody", label: "Texto principal do santinho", area: true },
+  { key: "santinhoMessageTitle", label: "Mensagem curta do santinho" },
+  { key: "santinhoMessageBody", label: "Texto da mensagem do santinho", area: true },
+  { key: "joinTitle", label: "Título da seção Faça parte" },
+  { key: "joinTitleEm", label: "Destaque da seção Faça parte" },
+  { key: "joinDescription", label: "Descrição da seção Faça parte", area: true },
+  { key: "candidateNumber", label: "Número da candidata" },
+  { key: "partyName", label: "Partido" },
+  { key: "coalitionName", label: "Coligação · nome" },
+  { key: "coalitionParties", label: "Coligação · partidos e federações", area: true },
+  { key: "coalitionGovernorName", label: "Coligação · nome do governador" },
+  { key: "coalitionGovernorNumber", label: "Coligação · número do governador" },
+  { key: "coalitionSenatorName", label: "Coligação · nome do senador" },
+  { key: "coalitionSenatorNumber", label: "Coligação · número do senador" },
+  { key: "coalitionStateDeputyName", label: "Coligação · nome do deputado estadual" },
+  { key: "coalitionStateDeputyNumber", label: "Coligação · número do deputado estadual" },
+  { key: "coalitionFederalDeputyName", label: "Coligação · nome da deputada federal" },
+  { key: "coalitionFederalDeputyNumber", label: "Coligação · número da deputada federal" },
+];
+
+type MediaKey = "siteHeaderLogo" | "siteFooterLogo" | "digitalCardLogo" | "santinhoLogo" | "partyLightLogo" | "partyDarkLogo" | "heroImage" | "storyImage" | "santinhoImage" | "galleryImage1" | "galleryImage2" | "galleryImage3" | "galleryImage4" | "galleryImage5";
+
+const mediaFields: Array<{ key: MediaKey; label: string; description: string; dimensions: string; alt: string; preserveTransparency?: boolean }> = [
+  { key: "siteHeaderLogo", label: "Logo · cabeçalho da home e páginas", description: "Logo aplicada no topo da home, agenda, notícias, santinho e páginas legais.", dimensions: "1536 × 1024 px · PNG transparente", alt: "Prévia da logo do cabeçalho", preserveTransparency: true },
+  { key: "siteFooterLogo", label: "Logo · rodapé azul", description: "Logo branca/transparente usada no rodapé principal do site.", dimensions: "1536 × 1024 px · PNG transparente", alt: "Prévia da logo do rodapé", preserveTransparency: true },
+  { key: "digitalCardLogo", label: "Logo · cartão digital da home", description: "Logo da composição visual na seção do santinho dentro da home.", dimensions: "1672 × 941 px · PNG transparente", alt: "Prévia da logo do cartão digital", preserveTransparency: true },
+  { key: "santinhoLogo", label: "Logo · santinho digital", description: "Logo nominal branca usada no painel azul do santinho e na impressão A4.", dimensions: "1453 × 480 px · PNG transparente", alt: "Prévia da logo do santinho", preserveTransparency: true },
+  { key: "partyLightLogo", label: "Logo Cidadania · fundo claro", description: "Versão do partido para aplicações sobre fundos claros.", dimensions: "333 × 146 px · PNG transparente", alt: "Prévia do Cidadania para fundo claro", preserveTransparency: true },
+  { key: "partyDarkLogo", label: "Logo Cidadania · fundo azul", description: "Versão branca do partido usada no hero, rodapé e santinho sobre fundo azul.", dimensions: "333 × 146 px · PNG transparente", alt: "Prévia do Cidadania para fundo azul", preserveTransparency: true },
+  { key: "heroImage", label: "Imagem principal da home", description: "Retrato exibido na abertura do site.", dimensions: "1200 × 1554 px · vertical", alt: "Prévia da imagem principal" },
+  { key: "storyImage", label: "Imagem da história", description: "Foto da seção A história por trás do nome.", dimensions: "1536 × 1024 px · paisagem", alt: "Prévia da imagem da história" },
+  { key: "santinhoImage", label: "Foto do santinho digital", description: "Foto usada na página e na impressão do santinho.", dimensions: "1536 × 1024 px · composição horizontal", alt: "Prévia da foto do santinho" },
+  { key: "galleryImage1", label: "Galeria · registro principal", description: "Primeiro registro da galeria da home.", dimensions: "1536 × 1024 px · paisagem", alt: "Prévia da galeria 1" },
+  { key: "galleryImage2", label: "Galeria · identidade visual", description: "Segundo item exibido na galeria.", dimensions: "1536 × 1024 px · PNG transparente", alt: "Prévia da galeria 2" },
+  { key: "galleryImage3", label: "Galeria · slogan", description: "Terceiro item exibido na galeria.", dimensions: "1536 × 1024 px · PNG transparente", alt: "Prévia da galeria 3" },
+  { key: "galleryImage4", label: "Galeria · aplicação clara", description: "Quarto item exibido na galeria.", dimensions: "1536 × 1024 px · PNG transparente", alt: "Prévia da galeria 4" },
+  { key: "galleryImage5", label: "Galeria · versão com slogan", description: "Quinto item exibido na galeria.", dimensions: "1536 × 1024 px · PNG transparente", alt: "Prévia da galeria 5" },
+];
+
+const blankAgenda = (): AgendaItem => ({ id: "", date: "", day: "", month: "", title: "", location: "", detail: "", tone: "teal" });
+const blankNews = (): NewsItem => ({ id: "", category: "", title: "", excerpt: "", readTime: "", image: "/campaign/claudia-hero.jpeg", publishedAt: new Date().toISOString().slice(0, 10) });
+
+async function compressImage(file: File, preserveTransparency = false) {
+  const objectUrl = URL.createObjectURL(file);
+  try {
+    const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const element = new window.Image();
+      element.onload = () => resolve(element);
+      element.onerror = () => reject(new Error("Não foi possível ler esta imagem."));
+      element.src = objectUrl;
+    });
+    const maxWidth = 1800;
+    const scale = Math.min(1, maxWidth / image.naturalWidth);
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+    canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+    const context = canvas.getContext("2d");
+    if (!context) throw new Error("Não foi possível preparar esta imagem.");
+    context.drawImage(image, 0, 0, canvas.width, canvas.height);
+    let quality = 0.84;
+    const mimeType = preserveTransparency ? "image/webp" : "image/jpeg";
+    let dataUrl = canvas.toDataURL(mimeType, quality);
+    while (dataUrl.length > 1_800_000 && quality > 0.58) {
+      quality -= 0.08;
+      dataUrl = canvas.toDataURL(mimeType, quality);
+    }
+    if (dataUrl.length > 1_800_000) throw new Error("A imagem continua muito grande. Escolha uma foto menor.");
+    return dataUrl;
+  } finally {
+    URL.revokeObjectURL(objectUrl);
+  }
+}
+
+export default function AdminClient({ userEmail }: { userEmail: string }) {
+  const [tab, setTab] = useState<Tab>("overview");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [payload, setPayload] = useState<CmsPayload>({ content: defaultContent, agenda: [], news: [] });
+  const [agendaDraft, setAgendaDraft] = useState<AgendaItem | null>(null);
+  const [newsDraft, setNewsDraft] = useState<NewsItem | null>(null);
+  const [query, setQuery] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [notice, setNotice] = useState("Carregando conteúdo publicado...");
+  const [currentUserEmail, setCurrentUserEmail] = useState(userEmail);
+
+  async function load() {
+    setLoading(true);
+    try {
+      const response = await fetch("/api/cms", { cache: "no-store" });
+      const raw = await response.text();
+      let next: CmsPayload & { error?: string };
+      try {
+        next = JSON.parse(raw) as CmsPayload & { error?: string };
+      } catch {
+        throw new Error(`O servidor não retornou um conteúdo válido (${response.status}).`);
+      }
+      if (!response.ok) throw new Error(next.error ?? "Não foi possível carregar o CMS.");
+      if (next.isAdmin !== true) {
+        window.location.href = "/admin/login";
+        return;
+      }
+      setPayload({ content: { ...defaultContent, ...next.content }, agenda: next.agenda ?? [], news: next.news ?? [] });
+      if (next.adminEmail) setCurrentUserEmail(next.adminEmail);
+      setNotice("Conteúdo sincronizado com o site público.");
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "Falha ao carregar o CMS.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => { void load(); }, 0);
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  async function request(url: string, options: RequestInit) {
+    setSaving(true);
+    try {
+      const response = await fetch(url, { ...options, headers: { "content-type": "application/json", ...(options.headers ?? {}) } });
+      const raw = await response.text();
+      let next: CmsPayload & { error?: string };
+      try {
+        next = JSON.parse(raw) as CmsPayload & { error?: string };
+      } catch {
+        throw new Error(`O servidor não retornou um conteúdo válido (${response.status}).`);
+      }
+      if (!response.ok) throw new Error(next.error ?? "Não foi possível salvar.");
+      setPayload({ content: { ...defaultContent, ...next.content }, agenda: next.agenda ?? [], news: next.news ?? [] });
+      setNotice("Alteração publicada no site.");
+      return true;
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "Falha ao salvar.");
+      return false;
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function saveContent(key: keyof SiteContent) {
+    await request("/api/cms", { method: "PUT", body: JSON.stringify({ resource: "content", key, value: payload.content[key] }) });
+  }
+
+  async function prepareImage(key: MediaKey, file: File) {
+    try {
+      const field = mediaFields.find((item) => item.key === key);
+      const value = await compressImage(file, field?.preserveTransparency);
+      setPayload((current) => ({ ...current, content: { ...current.content, [key]: value } }));
+      setNotice(`${field?.label ?? "Imagem"} preparada. Clique em “Salvar imagem” para publicar.`);
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "Não foi possível preparar a imagem.");
+    }
+  }
+
+  async function prepareNewsImage(file: File) {
+    try {
+      const value = await compressImage(file);
+      setNewsDraft((current) => current ? { ...current, image: value } : current);
+      setNotice("Imagem da notícia preparada. Publique a notícia para salvar.");
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "Não foi possível preparar a imagem da notícia.");
+    }
+  }
+
+  function restoreImage(key: MediaKey) {
+    setPayload((current) => ({ ...current, content: { ...current.content, [key]: defaultContent[key] } }));
+    setNotice("Imagem padrão restaurada no formulário. Clique em “Salvar imagem” para publicar.");
+  }
+
+  async function saveAgenda(event: FormEvent) {
+    event.preventDefault();
+    if (!agendaDraft) return;
+    const editing = Boolean(agendaDraft.id);
+    const ok = await request("/api/cms", { method: editing ? "PUT" : "POST", body: JSON.stringify(editing ? { resource: "agenda", id: agendaDraft.id, item: agendaDraft } : { resource: "agenda", item: agendaDraft }) });
+    if (ok) setAgendaDraft(null);
+  }
+
+  async function saveNews(event: FormEvent) {
+    event.preventDefault();
+    if (!newsDraft) return;
+    const editing = Boolean(newsDraft.id);
+    const ok = await request("/api/cms", { method: editing ? "PUT" : "POST", body: JSON.stringify(editing ? { resource: "news", id: newsDraft.id, item: newsDraft } : { resource: "news", item: newsDraft }) });
+    if (ok) setNewsDraft(null);
+  }
+
+  async function remove(resource: "agenda" | "news", id?: string) {
+    if (!id || !window.confirm("Excluir este conteúdo do site?")) return;
+    await request(`/api/cms?resource=${resource}&id=${encodeURIComponent(id)}`, { method: "DELETE" });
+  }
+
+  async function signOut() {
+    await fetch("/api/admin/logout", { method: "POST" });
+    window.location.href = "/admin/login";
+  }
+
+  function navigate(nextTab: Tab) {
+    setTab(nextTab);
+    setSidebarOpen(false);
+  }
+
+  const filteredNews = useMemo(() => payload.news.filter((item) => `${item.title} ${item.category}`.toLocaleLowerCase().includes(query.toLocaleLowerCase())), [payload.news, query]);
+  const tabTitle = tab === "overview" ? "Visão geral" : tab === "content" ? "Site e santinho" : tab === "agenda" ? "Agenda pública" : "Notícias";
+
+  return (
+    <main className="cms-app">
+      <aside className={sidebarOpen ? "cms-sidebar open" : "cms-sidebar"}>
+        <div className="cms-sidebar-brand"><Link href="/"><img src="/campaign/logo-transparent-dark.png" alt="Claudia Benassuly" /></Link><span>CMS DA CAMPANHA</span></div>
+        <div className="cms-sidebar-label">Workspace</div>
+        <nav className="cms-sidebar-nav" aria-label="Navegação do CMS">
+          <button className={tab === "overview" ? "active" : ""} onClick={() => navigate("overview")}><b>01</b><span>Visão geral</span></button>
+          <button className={tab === "content" ? "active" : ""} onClick={() => navigate("content")}><b>02</b><span>Site e santinho</span></button>
+          <button className={tab === "agenda" ? "active" : ""} onClick={() => navigate("agenda")}><b>03</b><span>Agenda</span><i>{payload.agenda.length}</i></button>
+          <button className={tab === "news" ? "active" : ""} onClick={() => navigate("news")}><b>04</b><span>Notícias</span><i>{payload.news.length}</i></button>
+        </nav>
+        <div className="cms-sidebar-bottom"><Link href="/"><span>↗</span> Ver site público</Link><button onClick={signOut}><span>↪</span> Sair da conta</button></div>
+      </aside>
+
+      <div className="cms-workspace">
+        <header className="cms-topbar">
+          <button className="cms-mobile-menu" onClick={() => setSidebarOpen((value) => !value)} aria-label="Abrir menu do painel">☰</button>
+          <div><span className="cms-breadcrumb">PAINEL / {tabTitle.toUpperCase()}</span><h1>{tabTitle}</h1></div>
+          <div className="cms-topbar-actions"><span className="cms-live-pill"><i /> Site online</span><a className="cms-export-link" href="/api/cms?download=1">Baixar backup</a><span className="cms-account">{currentUserEmail}</span><button className="cms-topbar-exit" onClick={signOut}>Sair</button></div>
+        </header>
+
+        <div className="cms-content-area">
+          <div className="cms-status"><span className={loading ? "cms-status-dot loading" : "cms-status-dot"} /> {saving ? "Publicando alteração..." : notice}</div>
+
+          {tab === "overview" && <section className="cms-dashboard">
+            <div className="cms-welcome"><div><span className="cms-dashboard-kicker">CENTRAL DE COMANDO</span><h2>Olá, gestor.<br /><em>A campanha está em movimento.</em></h2><p>Atualize o conteúdo público, acompanhe a agenda e publique novas histórias em poucos cliques.</p></div><Link className="cms-dashboard-link" href="/">Abrir site público ↗</Link></div>
+            <div className="cms-stat-grid"><button onClick={() => navigate("content")}><span>Conteúdo editável</span><strong>{Object.keys(defaultContent).length}</strong><small>campos no site e santinho</small></button><button onClick={() => navigate("agenda")}><span>Compromissos</span><strong>{payload.agenda.length}</strong><small>itens na agenda pública</small></button><button onClick={() => navigate("news")}><span>Publicações</span><strong>{payload.news.length}</strong><small>notícias cadastradas</small></button></div>
+            <div className="cms-dashboard-columns"><section className="cms-dashboard-panel"><div className="cms-dashboard-panel-head"><div><span className="cms-dashboard-kicker">AÇÕES RÁPIDAS</span><h3>O que você deseja atualizar?</h3></div></div><div className="cms-quick-actions"><button onClick={() => navigate("content")}><b>02</b><span><strong>Textos do site</strong><small>Home, manifesto, santinho e chamada.</small></span><i>→</i></button><button onClick={() => { setAgendaDraft(blankAgenda()); navigate("agenda"); }}><b>03</b><span><strong>Novo compromisso</strong><small>Cadastre um evento na agenda.</small></span><i>→</i></button><button onClick={() => { setNewsDraft(blankNews()); navigate("news"); }}><b>04</b><span><strong>Nova notícia</strong><small>Publique uma atualização da campanha.</small></span><i>→</i></button></div></section><section className="cms-dashboard-panel cms-dashboard-side"><span className="cms-dashboard-kicker">ACESSOS PÚBLICOS</span><h3>Links importantes</h3><Link href="/santinho">Santinho digital <span>↗</span></Link><Link href="/agenda">Agenda completa <span>↗</span></Link><Link href="/noticias">Todas as notícias <span>↗</span></Link></section></div>
+          </section>}
+
+          {tab === "content" && <section className="cms-panel"><div className="cms-panel-heading"><div><p className="eyebrow">Textos públicos</p><h2>Site e santinho</h2></div><button className="outline-button small" onClick={load}>Atualizar</button></div><div className="cms-content-grid">{contentFields.map((field) => <label className="cms-field" key={field.key}><span>{field.label}</span>{field.area ? <textarea value={payload.content[field.key]} onChange={(event) => setPayload((current) => ({ ...current, content: { ...current.content, [field.key]: event.target.value } }))} /> : <input value={payload.content[field.key]} onChange={(event) => setPayload((current) => ({ ...current, content: { ...current.content, [field.key]: event.target.value } }))} />}<button type="button" onClick={() => saveContent(field.key)}>Salvar este campo</button></label>)}</div></section>}
+
+          {tab === "content" && <section className="cms-panel cms-media-panel"><div className="cms-panel-heading"><div><p className="eyebrow">Biblioteca visual</p><h2>Imagens e logos por aplicação</h2><p className="cms-panel-description">Cada logo abaixo controla uma aplicação diferente do site: cabeçalho, rodapé, cartão digital, santinho e versões do partido. Troque arquivos sem editar código; logos transparentes são preservadas com transparência.</p></div></div><div className="cms-media-grid">{mediaFields.map((field) => <article className={`cms-media-card ${field.key.includes("Logo") || field.key.includes("logo") ? "cms-logo-card" : ""}`} key={field.key}><div className="cms-media-preview"><img src={payload.content[field.key]} alt={field.alt} /></div><div className="cms-media-info"><h3>{field.label}</h3><p>{field.description}</p><strong className="cms-media-dimensions">Tamanho recomendado: {field.dimensions}</strong><label className="cms-field"><span>URL ou imagem selecionada</span><input value={payload.content[field.key]} onChange={(event) => setPayload((current) => ({ ...current, content: { ...current.content, [field.key]: event.target.value } }))} /></label><div className="cms-media-actions"><label className="cms-upload-button">Escolher arquivo<input className="cms-upload-input" type="file" accept="image/*" onChange={(event) => { const file = event.currentTarget.files?.[0]; if (file) void prepareImage(field.key, file); event.currentTarget.value = ""; }} /></label><button className="primary-button small" type="button" onClick={() => saveContent(field.key)} disabled={saving}>{saving ? "Salvando..." : "Salvar imagem"}</button><button className="cms-reset-image" type="button" onClick={() => restoreImage(field.key)}>Restaurar padrão</button></div><small>{field.preserveTransparency ? "PNG ou WEBP transparente recomendado. O painel preserva a transparência ao preparar o arquivo." : "JPG, PNG ou WEBP. Fotos grandes são reduzidas automaticamente para manter o site rápido."}</small></div></article>)}</div></section>}
+
+          {tab === "agenda" && <section className="cms-panel"><div className="cms-panel-heading"><div><p className="eyebrow">Compromissos públicos</p><h2>Agenda da campanha</h2></div><button className="primary-button" onClick={() => setAgendaDraft(blankAgenda())}>Novo compromisso</button></div><div className="cms-record-list">{payload.agenda.map((item) => <article className="cms-record" key={item.id}><div className={`cms-record-date ${item.tone}`}><strong>{item.day}</strong><span>{item.month}</span></div><div><span>{item.date} · {item.location}</span><h3>{item.title}</h3><p>{item.detail}</p></div><div className="cms-record-actions"><button onClick={() => setAgendaDraft(item)}>Editar</button><button onClick={() => remove("agenda", item.id)}>Excluir</button><Link href={`/agenda#event-${item.id}`}>Ver página</Link></div></article>)}</div></section>}
+
+          {tab === "news" && <section className="cms-panel"><div className="cms-panel-heading"><div><p className="eyebrow">Publicações</p><h2>Notícias da campanha</h2></div><div className="cms-heading-actions"><input className="cms-search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar notícia" /><button className="primary-button" onClick={() => setNewsDraft(blankNews())}>Nova notícia</button></div></div><div className="cms-record-list">{filteredNews.map((item) => <article className="cms-record cms-news-record" key={item.id}><img src={item.image} alt="" /><div><span>{item.category} · {item.publishedAt}</span><h3>{item.title}</h3><p>{item.excerpt}</p></div><div className="cms-record-actions"><button onClick={() => setNewsDraft(item)}>Editar</button><button onClick={() => remove("news", item.id)}>Excluir</button><Link href={`/noticias#news-${item.id}`}>Ver página</Link></div></article>)}</div></section>}
+        </div>
+      </div>
+
+      {agendaDraft && <div className="cms-modal-backdrop"><form className="cms-modal" onSubmit={saveAgenda}><button type="button" className="cms-close" onClick={() => setAgendaDraft(null)}>×</button><p className="eyebrow">Agenda</p><h2>{agendaDraft.id ? "Editar compromisso" : "Novo compromisso"}</h2><div className="cms-form-grid"><Field label="Data exibida" value={agendaDraft.date} onChange={(value) => setAgendaDraft({ ...agendaDraft, date: value })} /><Field label="Dia" value={agendaDraft.day} onChange={(value) => setAgendaDraft({ ...agendaDraft, day: value })} /><Field label="Mês" value={agendaDraft.month} onChange={(value) => setAgendaDraft({ ...agendaDraft, month: value })} /><Field label="Tom visual" value={agendaDraft.tone} onChange={(value) => setAgendaDraft({ ...agendaDraft, tone: value as AgendaItem["tone"] })} /><Field label="Título" value={agendaDraft.title} onChange={(value) => setAgendaDraft({ ...agendaDraft, title: value })} /><Field label="Local" value={agendaDraft.location} onChange={(value) => setAgendaDraft({ ...agendaDraft, location: value })} /></div><label className="cms-field"><span>Detalhes</span><textarea value={agendaDraft.detail} onChange={(event) => setAgendaDraft({ ...agendaDraft, detail: event.target.value })} /></label><button className="primary-button" disabled={saving}>{saving ? "Publicando..." : "Publicar compromisso"}</button></form></div>}
+      {newsDraft && <div className="cms-modal-backdrop"><form className="cms-modal" onSubmit={saveNews}><button type="button" className="cms-close" onClick={() => setNewsDraft(null)}>×</button><p className="eyebrow">Notícias</p><h2>{newsDraft.id ? "Editar notícia" : "Nova notícia"}</h2><div className="cms-form-grid"><Field label="Categoria" value={newsDraft.category} onChange={(value) => setNewsDraft({ ...newsDraft, category: value })} /><Field label="Data de publicação" value={newsDraft.publishedAt ?? ""} onChange={(value) => setNewsDraft({ ...newsDraft, publishedAt: value })} /><Field label="Tempo de leitura" value={newsDraft.readTime} onChange={(value) => setNewsDraft({ ...newsDraft, readTime: value })} /><Field label="Imagem pública" value={newsDraft.image} onChange={(value) => setNewsDraft({ ...newsDraft, image: value })} /><label className="cms-upload-button cms-news-upload">Escolher imagem local<input className="cms-upload-input" type="file" accept="image/*" onChange={(event) => { const file = event.currentTarget.files?.[0]; if (file) void prepareNewsImage(file); event.currentTarget.value = ""; }} /></label><Field label="Título" value={newsDraft.title} onChange={(value) => setNewsDraft({ ...newsDraft, title: value })} /></div><label className="cms-field"><span>Resumo</span><textarea value={newsDraft.excerpt} onChange={(event) => setNewsDraft({ ...newsDraft, excerpt: event.target.value })} /></label><button className="primary-button" disabled={saving}>{saving ? "Publicando..." : "Publicar notícia"}</button></form></div>}
+    </main>
+  );
+}
+
+function Field({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
+  return <label className="cms-field"><span>{label}</span><input value={value} onChange={(event) => onChange(event.target.value)} required /></label>;
+}
