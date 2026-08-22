@@ -54,6 +54,79 @@ export default function SantinhoPage() {
 
   return (
     <main className="card-page">
+      <style>{`
+        @media print {
+          html, body, body.printing-santinho, body.printing-santinho .card-page,
+          body.printing-santinho .printable-santinho,
+          body.printing-santinho .digital-card-main,
+          body.printing-santinho .digital-card-content,
+          body.printing-santinho .digital-card-copy-large,
+          body.printing-santinho .digital-card-photo,
+          body.printing-santinho .digital-card-topline,
+          body.printing-santinho .digital-card-bottom,
+          body.printing-santinho .card-page-note {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+
+          body.printing-santinho .printable-santinho {
+            background: #fff !important;
+            color: #fff !important;
+          }
+
+          body.printing-santinho .printable-santinho .digital-card-main {
+            background: #071d4f !important;
+            color: #fff !important;
+          }
+
+          body.printing-santinho .printable-santinho .digital-card-copy-large {
+            background: #071d4f !important;
+            color: #fff !important;
+          }
+
+          body.printing-santinho .printable-santinho .digital-card-photo {
+            background: #9fc8d3 !important;
+          }
+
+          body.printing-santinho .printable-santinho .digital-card-topline,
+          body.printing-santinho .printable-santinho .digital-card-bottom {
+            background: #071d4f !important;
+            color: #fff !important;
+            border-color: rgba(255,255,255,.18) !important;
+          }
+
+          body.printing-santinho .printable-santinho .digital-card-topline strong,
+          body.printing-santinho .printable-santinho .digital-card-bottom strong,
+          body.printing-santinho .printable-santinho .card-kicker,
+          body.printing-santinho .printable-santinho .santinho-vote-number span,
+          body.printing-santinho .printable-santinho .santinho-vote-number strong {
+            color: #f0c64f !important;
+          }
+
+          body.printing-santinho .printable-santinho .digital-card-copy-large > p:not(.card-kicker) {
+            color: #b8c8df !important;
+          }
+
+          body.printing-santinho .printable-santinho .party-card-lockup span,
+          body.printing-santinho .printable-santinho .santinho-coalition-label,
+          body.printing-santinho .printable-santinho .santinho-coalition-list > span {
+            color: #8fa5c4 !important;
+          }
+
+          body.printing-santinho .printable-santinho .santinho-coalition-list b {
+            color: #d4deed !important;
+          }
+
+          body.printing-santinho .printable-santinho .santinho-coalition-parties {
+            color: #7189ad !important;
+          }
+
+          body.printing-santinho .printable-santinho .card-page-note {
+            background: #f0c64f !important;
+            color: #071d4f !important;
+          }
+        }
+      `}</style>
       <header className="card-page-header">
         <Link href="/" className="card-page-brand" aria-label="Voltar para a campanha Claudia Benassuly">
           <img src={siteContent.siteHeaderLogo} alt="Claudia Benassuly" />
