@@ -42,7 +42,7 @@ export default function AdminLoginPage() {
       `}</style>
       <div className="cms-login-brand">
         <Link href="/" aria-label="Voltar para a campanha Claudia Benassuly">
-          <img src="/campaign/logo-slogan-dark.png" alt="Claudia Benassuly — Deputada Federal — Por ela. Por nós. Por todas." />
+          <img src="/campaign/logo-transparent-dark.png" alt="Claudia Benassuly — Deputada Federal — Por ela. Por nós. Por todas." />
         </Link>
         <div className="cms-login-brand-copy"><strong>Central de conteúdo da campanha</strong><span>Gestão editorial · agenda · notícias · santinho digital</span></div>
       </div>
