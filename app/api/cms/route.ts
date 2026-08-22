@@ -51,8 +51,10 @@ export async function GET(request: Request) {
   }
 }
 
-async function mutate(request: Request, action: string) {
+async function mutate(request: Request, defaultAction: string) {
   const body = await request.json();
+  const specialActions = new Set(["profile", "admin_create", "admin_delete"]);
+  const action = specialActions.has(body.action) ? body.action : defaultAction;
   const response = await callCms(request, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ ...body, action }) });
   const raw = await response.text();
   let payload: unknown;
