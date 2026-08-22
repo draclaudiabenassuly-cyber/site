@@ -56,36 +56,24 @@ export default function SantinhoPage() {
     <main className="card-page">
       <style>{`
         @media print {
-          @page {
-            size: A4 landscape;
-            margin: 0;
-          }
+          @page { size: A4 landscape; margin: 0; }
 
-          html,
-          body {
+          html, body {
             width: 297mm !important;
             height: 210mm !important;
+            min-height: 210mm !important;
             margin: 0 !important;
             padding: 0 !important;
+            overflow: hidden !important;
             background: #fff !important;
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
           }
 
-          body.printing-santinho {
-            overflow: hidden !important;
-          }
+          body.printing-santinho .card-page > * { display: none !important; }
+          body.printing-santinho .card-page > .printable-santinho { display: block !important; }
 
-          /* Na impressão existe somente a arte. Header, textos, botões,
-             rodapé, links e o VLibras ficam fora do documento impresso. */
-          body.printing-santinho .card-page > * {
-            display: none !important;
-          }
-
-          body.printing-santinho .card-page > .printable-santinho {
-            display: block !important;
-          }
-
+          body.printing-santinho .card-page,
           body.printing-santinho .printable-santinho,
           body.printing-santinho .printable-santinho * {
             -webkit-print-color-adjust: exact !important;
@@ -94,19 +82,21 @@ export default function SantinhoPage() {
 
           body.printing-santinho .card-page {
             width: 297mm !important;
-            min-height: 210mm !important;
             height: 210mm !important;
+            min-height: 210mm !important;
             margin: 0 !important;
             padding: 0 !important;
-            background: #fff !important;
             overflow: hidden !important;
+            background: #fff !important;
           }
 
+          /* Folha inteira: 192 mm de arte + 18 mm de faixa amarela inferior. */
           body.printing-santinho .printable-santinho {
+            display: block !important;
             width: 297mm !important;
             max-width: 297mm !important;
-            height: auto !important;
-            min-height: 0 !important;
+            height: 210mm !important;
+            min-height: 210mm !important;
             margin: 0 !important;
             padding: 0 !important;
             box-shadow: none !important;
@@ -117,32 +107,51 @@ export default function SantinhoPage() {
           }
 
           body.printing-santinho .printable-santinho .digital-card-main {
-            width: 100% !important;
+            width: 297mm !important;
+            height: 192mm !important;
+            min-height: 192mm !important;
+            max-height: 192mm !important;
+            overflow: hidden !important;
             background: #071d4f !important;
             color: #fff !important;
             page-break-inside: avoid !important;
             break-inside: avoid !important;
           }
 
-          body.printing-santinho .printable-santinho .digital-card-content {
-            page-break-inside: avoid !important;
-            break-inside: avoid !important;
-          }
-
-          body.printing-santinho .printable-santinho .digital-card-copy-large,
-          body.printing-santinho .printable-santinho .digital-card-photo,
           body.printing-santinho .printable-santinho .digital-card-topline,
           body.printing-santinho .printable-santinho .digital-card-bottom {
+            background: #071d4f !important;
+            color: #fff !important;
+            border-color: rgba(255,255,255,.18) !important;
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
           }
 
+          body.printing-santinho .printable-santinho .digital-card-content {
+            width: 100% !important;
+            height: 166mm !important;
+            min-height: 166mm !important;
+            max-height: 166mm !important;
+            overflow: hidden !important;
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+          }
+
           body.printing-santinho .printable-santinho .digital-card-copy-large {
+            height: 166mm !important;
+            min-height: 166mm !important;
+            max-height: 166mm !important;
+            padding: 8mm 9mm !important;
+            overflow: hidden !important;
             background: #071d4f !important;
             color: #fff !important;
           }
 
           body.printing-santinho .printable-santinho .digital-card-photo {
+            height: 166mm !important;
+            min-height: 166mm !important;
+            max-height: 166mm !important;
+            overflow: hidden !important;
             background: #9fc8d3 !important;
           }
 
@@ -151,15 +160,13 @@ export default function SantinhoPage() {
             width: 100% !important;
             height: 100% !important;
             object-fit: cover !important;
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
           }
 
           body.printing-santinho .printable-santinho .digital-card-topline,
           body.printing-santinho .printable-santinho .digital-card-bottom {
-            background: #071d4f !important;
-            color: #fff !important;
-            border-color: rgba(255,255,255,.18) !important;
+            min-height: 13mm !important;
+            height: 13mm !important;
+            padding: 4mm 7mm !important;
           }
 
           body.printing-santinho .printable-santinho .digital-card-topline strong,
@@ -174,77 +181,64 @@ export default function SantinhoPage() {
             color: #b8c8df !important;
           }
 
-          /* A área da coligação não pode desaparecer nem quebrar entre páginas. */
-          body.printing-santinho .printable-santinho .santinho-coalition {
+          body.printing-santinho .printable-santinho .santinho-coalition,
+          body.printing-santinho .printable-santinho .santinho-coalition-label,
+          body.printing-santinho .printable-santinho .santinho-coalition-list,
+          body.printing-santinho .printable-santinho .santinho-coalition-list > span {
             display: block !important;
             visibility: visible !important;
             opacity: 1 !important;
-            color: #d4deed !important;
             page-break-inside: avoid !important;
             break-inside: avoid !important;
           }
 
-          body.printing-santinho .printable-santinho .santinho-coalition-label {
-            display: block !important;
-            color: #8fa5c4 !important;
-          }
+          body.printing-santinho .printable-santinho .santinho-coalition { color: #d4deed !important; }
+          body.printing-santinho .printable-santinho .santinho-coalition-label { color: #8fa5c4 !important; }
+          body.printing-santinho .printable-santinho .santinho-coalition-list { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 3px 12px !important; }
+          body.printing-santinho .printable-santinho .santinho-coalition-list > span { color: #8fa5c4 !important; }
+          body.printing-santinho .printable-santinho .santinho-coalition-list b { color: #fff !important; }
+          body.printing-santinho .printable-santinho .santinho-coalition-parties { display: block !important; color: #7189ad !important; }
 
-          body.printing-santinho .printable-santinho .santinho-coalition-list {
-            display: grid !important;
-            grid-template-columns: 1fr 1fr !important;
-            gap: 4px 12px !important;
-            color: #d4deed !important;
-          }
-
-          body.printing-santinho .printable-santinho .santinho-coalition-list > span {
-            display: block !important;
-            color: #8fa5c4 !important;
-            white-space: normal !important;
-          }
-
-          body.printing-santinho .printable-santinho .santinho-coalition-list b {
-            color: #fff !important;
-          }
-
-          body.printing-santinho .printable-santinho .santinho-coalition-parties {
-            display: block !important;
-            color: #7189ad !important;
-          }
-
+          /* A faixa amarela faz parte da arte e precisa obrigatoriamente entrar no PDF. */
           body.printing-santinho .printable-santinho .card-page-note {
             display: flex !important;
+            align-items: center !important;
+            width: 297mm !important;
+            height: 18mm !important;
+            min-height: 18mm !important;
+            max-height: 18mm !important;
+            margin: 0 !important;
+            padding: 3mm 7mm !important;
+            overflow: hidden !important;
             background: #f0c64f !important;
             color: #071d4f !important;
+            page-break-before: avoid !important;
             page-break-inside: avoid !important;
             break-inside: avoid !important;
           }
 
-          /* Segurança adicional: qualquer widget do VLibras injetado pelo script
-             também fica invisível no PDF/impressão. */
+          body.printing-santinho .printable-santinho .card-page-note span,
+          body.printing-santinho .printable-santinho .card-page-note strong,
+          body.printing-santinho .printable-santinho .card-page-note p { color: #071d4f !important; }
+
+          /* VLibras jamais faz parte do documento impresso. */
           body.printing-santinho .vlibras-widget,
           body.printing-santinho [vw],
           body.printing-santinho [vw-access-button],
           body.printing-santinho [vw-plugin-wrapper],
           body.printing-santinho .vpw-container,
-          body.printing-santinho .vpw-wrapper {
-            display: none !important;
-            visibility: hidden !important;
-          }
+          body.printing-santinho .vpw-wrapper { display: none !important; visibility: hidden !important; }
         }
       `}</style>
       <header className="card-page-header">
-        <Link href="/" className="card-page-brand" aria-label="Voltar para a campanha Claudia Benassuly">
-          <img src={siteContent.siteHeaderLogo} alt="Claudia Benassuly" />
-        </Link>
+        <Link href="/" className="card-page-brand" aria-label="Voltar para a campanha Claudia Benassuly"><img src={siteContent.siteHeaderLogo} alt="Claudia Benassuly" /></Link>
         <Link href="/" className="card-page-back">Voltar para o site</Link>
       </header>
-
       <section className="card-page-intro">
         <p className="eyebrow"><span /> Compartilhe este link</p>
         <h1>O santinho da campanha, <em>agora digital.</em></h1>
         <p>Envie esta página para quem precisa conhecer a Claudia, suas propostas e o número {siteContent.candidateNumber}.</p>
       </section>
-
       <section className="digital-card-stand printable-santinho" aria-label="Santinho digital Claudia Benassuly">
         <div className="digital-card-main">
           <div className="digital-card-topline"><span>Pré-candidata a Deputada Federal</span><strong>{siteContent.candidateNumber}</strong></div>
@@ -272,13 +266,11 @@ export default function SantinhoPage() {
         </div>
         <div className="card-page-note"><span>Mensagem da campanha</span><strong>{siteContent.santinhoMessageTitle}</strong><p>{siteContent.santinhoMessageBody}</p></div>
       </section>
-
       <div className="card-page-actions">
         <button className="primary-button" onClick={shareCard}>{copied ? "Link copiado" : "Compartilhar santinho"}</button>
         <button className="outline-button" onClick={printCard}>Salvar para imprimir</button>
         <a className="text-button" href={whatsappLink} target="_blank" rel="noreferrer">Falar com a campanha <span>↗</span></a>
       </div>
-
       <div className="card-page-footer"><Link href="/">Claudia Benassuly</Link><span>Partido {siteContent.partyName} · candidata {siteContent.candidateNumber}</span><a href={whatsappLink} target="_blank" rel="noreferrer">WhatsApp da campanha</a><Link href="/politica-de-privacidade">Privacidade</Link><Link href="/cookies">Cookies</Link><Link href="/termos-de-uso">Termos de uso</Link><a href="https://douglasbragaoficial.com.br" target="_blank" rel="noreferrer">Desenvolvido por Douglas Braga</a></div>
       <div className="card-page-legal"><strong>Informações legais</strong><span>Eleição Claudia de Fatima e Silva — Deputado Federal · CNPJ 68.553.373/0001-23</span><span>Av. Nazaré, 272, Ed. Clube de Engenharia, Sala 104 · Nazaré · Belém/PA · CEP 66.035-115</span><span>E-mail oficial: psdbpaestadual@gmail.com · Contato: draclaudiabenassuly@gmail.com</span><small>© 2026 Claudia Benassuly. Todos os direitos reservados.</small></div>
       <VlibrasWidget />
