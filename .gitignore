@@ -1,0 +1,17 @@
+node_modules/
+.next/
+out/
+.vercel/
+/.sites-runtime/
+/.site-eleitoral-supabase-ready.*
+/.wrangler/
+/dist/
+.env
+.env.local
+.env.*.local
+.DS_Store
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.tsbuildinfo
