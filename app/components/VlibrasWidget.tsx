@@ -77,7 +77,7 @@ function getPanelLayout() {
       width: "min(300px, calc(100vw - 76px))",
       maxWidth: "calc(100vw - 76px)",
       maxHeight: "calc(100dvh - 32px)",
-      height: "min(420px, calc(100dvh - 32px))",
+      height: "min(440px, calc(100dvh - 32px))",
     };
   }
 
@@ -89,7 +89,7 @@ function getPanelLayout() {
     width: "min(380px, calc(100vw - 92px))",
     maxWidth: "calc(100vw - 92px)",
     maxHeight: "calc(100vh - 32px)",
-    height: "min(620px, calc(100vh - 32px))",
+    height: "min(440px, calc(100vh - 32px))",
   };
 }
 
@@ -254,14 +254,11 @@ function pinOpenedPanel() {
   const host = document.getElementById("vlibras-app-root") as HTMLElement | null;
   if (!host) return;
 
-  // The current VLibras script creates the shadow host already active and
-  // showing its splash screen. Keep it closed until the visible access button
-  // is clicked, then follow the official data-active state for open/close.
+  // The current VLibras script creates the shadow host already active. Keep
+  // the panel visually closed until the visible access button is clicked,
+  // while allowing the official player to finish loading in the background.
   if (preparedPanelHost !== host) {
     preparedPanelHost = host;
-  }
-  if (!accessButtonInteracted && host.getAttribute("data-active") === "true") {
-    host.setAttribute("data-active", "false");
   }
   const isActive = accessButtonInteracted && host.getAttribute("data-active") === "true";
   const layout = getPanelLayout();
