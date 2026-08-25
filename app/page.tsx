@@ -2,7 +2,7 @@
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { defaultContent, type GalleryPhoto, type SiteContent } from "../lib/cms-defaults";
-import { publicMediaSrc } from "../lib/public-media";
+import { mediaRevisionFor as stableMediaRevision, publicMediaSrc } from "../lib/public-media";
 
 type AgendaItem = {
   id?: string;
@@ -138,6 +138,27 @@ const defaultAxes = [
 
 const assistantClosing =
   "Se você deseja mais detalhes, entre em contato pelo WhatsApp aqui no site. Nossa equipe terá prazer em fornecer todas as informações mais completas e tirar suas dúvidas!";
+
+function mediaRevisionFor(content: Partial<SiteContent>, photos: GalleryPhoto[] = []) {
+  return stableMediaRevision([
+    content.siteHeaderLogo,
+    content.siteFooterLogo,
+    content.digitalCardLogo,
+    content.santinhoLogo,
+    content.partyLightLogo,
+    content.partyDarkLogo,
+    content.ogImage,
+    content.heroImage,
+    content.storyImage,
+    content.santinhoImage,
+    content.galleryImage1,
+    content.galleryImage2,
+    content.galleryImage3,
+    content.galleryImage4,
+    content.galleryImage5,
+    ...photos.map((photo) => photo.image),
+  ]);
+}
 
 const faq = [
   {
@@ -391,7 +412,7 @@ export default function Home() {
   const [agendaItems, setAgendaItems] = useState<AgendaItem[]>(agenda);
   const [newsItems, setNewsItems] = useState<Post[]>(posts);
   const [cmsGalleryPhotos, setCmsGalleryPhotos] = useState<GalleryPhoto[]>([]);
-  const [cmsRevision, setCmsRevision] = useState(0);
+  const [cmsRevision, setCmsRevision] = useState(() => mediaRevisionFor(defaultContent));
 
   useEffect(() => {
     let disposed = false;
@@ -401,11 +422,13 @@ export default function Home() {
         if (!response.ok || disposed) return;
         const payload = await response.json();
         if (!payload || disposed) return;
-        if (payload.content) setSiteContent({ ...defaultContent, ...payload.content });
+        const nextContent = payload.content ? { ...defaultContent, ...payload.content } : defaultContent;
+        const nextPhotos = Array.isArray(payload.photos) ? payload.photos : [];
+        if (payload.content) setSiteContent(nextContent);
         if (Array.isArray(payload.agenda)) setAgendaItems(payload.agenda);
         if (Array.isArray(payload.news)) setNewsItems(payload.news);
-        if (Array.isArray(payload.photos)) setCmsGalleryPhotos(payload.photos);
-        setCmsRevision(Date.now());
+        if (Array.isArray(payload.photos)) setCmsGalleryPhotos(nextPhotos);
+        setCmsRevision(mediaRevisionFor(nextContent, nextPhotos));
       } catch { /* public pages keep the safe bundled defaults */ }
     };
     void load();
@@ -512,7 +535,7 @@ export default function Home() {
       </div>
 
       <header className="site-header">
-        <button className="brand-lockup" onClick={() => scrollTo("inicio")} aria-label="Voltar para o início">
+        <button type="button" className="brand-lockup" onClick={() => scrollTo("inicio")} aria-label="Voltar para o início">
           <img src={publicMediaSrc(siteContent.siteHeaderLogo, cmsRevision)} alt="Cláudia Benassuly" />
         </button>
         <nav className={mobileMenu ? "main-nav open" : "main-nav"} aria-label="Navegação principal">
@@ -526,7 +549,7 @@ export default function Home() {
             Fale com a campanha <ArrowUpRight />
           </a>
         </nav>
-        <button className="mobile-menu" onClick={() => setMobileMenu((value) => !value)} aria-label="Abrir menu">
+        <button type="button" className="mobile-menu" onClick={() => setMobileMenu((value) => !value)} aria-label="Abrir menu">
           <MenuIcon />
         </button>
       </header>
@@ -565,7 +588,6 @@ export default function Home() {
             <img src={publicMediaSrc(siteContent.heroImage, cmsRevision)} alt="Cláudia Benassuly sorrindo para a campanha" />
             <div className="photo-wash" />
           </div>
-          <div className="hero-number"><small>{siteContent.heroNumberLabel.replace("Cidadania", siteContent.partyName)}</small><CandidateNumber value={siteContent.candidateNumber} /></div>
           <div className="hero-stamp"><SparkIcon /><span>presença<br />que cuida</span></div>
         </div>
         <div className="hero-scroll-note"><span /> Role para conhecer</div>
@@ -686,7 +708,7 @@ export default function Home() {
         <div className="section-heading-row"><div><p className="eyebrow"><span /> {siteContent.newsEyebrow}</p><h2>{siteContent.newsTitle} <em>{siteContent.newsTitleEm}</em></h2></div><a className="outline-button small" href="/noticias">Ver todas as notícias <ArrowUpRight /></a></div>
         <div className="news-grid">
           {newsItems.map((post, index) => (
-            <article className={`news-card news-${index + 1}`} key={post.id ?? post.title} onClick={() => setActivePost(post)}>
+            <article className={`news-card news-${index + 1}`} key={post.id ?? post.title} role="button" tabIndex={0} aria-label={`Abrir notícia: ${post.title}`} onClick={() => setActivePost(post)} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setActivePost(post); } }}>
               <div className="news-image"><img src={publicMediaSrc(post.image, cmsRevision)} alt="" /><span className="news-index">0{index + 1}</span><span className="news-open"><ArrowUpRight /></span></div>
               <div className="news-copy"><span>{post.category}</span><h3>{post.title}</h3><p>{post.excerpt}</p><small>{post.readTime}</small></div>
             </article>
@@ -698,7 +720,7 @@ export default function Home() {
         <div className="section-heading-row"><div><p className="eyebrow"><span /> {siteContent.galleryEyebrow}</p><h2>{siteContent.galleryTitle} <em>{siteContent.galleryTitleEm}</em></h2></div><p className="heading-note">{siteContent.galleryDescription}</p></div>
         <div className="gallery-grid">
           {gallery.map((photo) => (
-            <button className={`gallery-card ${photo.span}`} key={photo.src} onClick={() => setActivePhoto(photo.src)} aria-label={`Abrir foto: ${photo.label}`}>
+            <button type="button" className={`gallery-card ${photo.span}`} key={photo.src} onClick={() => setActivePhoto(photo.src)} aria-label={`Abrir foto: ${photo.label}`}>
               <img src={publicMediaSrc(photo.src, cmsRevision)} alt={photo.label} /><span className="gallery-overlay"><small>{photo.label}</small><ArrowUpRight /></span>
             </button>
           ))}
@@ -708,7 +730,7 @@ export default function Home() {
 
       <section id="santinho" className="digital-card-section section-pad printable-santinho">
         <div className="digital-card-copy"><p className="eyebrow"><span /> {siteContent.santinhoEyebrow}</p><h2>{siteContent.santinhoTitle} <em>{siteContent.santinhoTitleEm}</em></h2><p>{siteContent.santinhoDescription}</p><div className="digital-actions"><a className="primary-button" href="/santinho">Abrir santinho digital <ArrowUpRight /></a><button className="text-button" onClick={() => { window.location.href = "/santinho?print=1"; }}>Salvar para imprimir <span>↓</span></button></div></div>
-        <div className="digital-card-art"><div className="digital-glow" /><img src={publicMediaSrc(siteContent.digitalCardLogo, cmsRevision)} alt={`Cláudia Benassuly ${siteContent.candidateNumber}`} /><div className="card-chip"><SparkIcon /><span>Vote<br /><strong>{siteContent.candidateNumber}</strong></span></div></div>
+        <div className="digital-card-art"><div className="digital-glow" /><img src={publicMediaSrc(siteContent.digitalCardLogo, cmsRevision)} alt={`Cláudia Benassuly ${siteContent.candidateNumber}`} /></div>
       </section>
 
       <section className="join-section section-pad">

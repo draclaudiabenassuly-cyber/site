@@ -47,6 +47,11 @@ body { overflow-x: hidden; }
   .main-nav button, .main-nav a { font-size: 11px; }
 }
 
+/* Keep the article itself as the click target, even when its image or copy is overlaid. */
+.news-card > * { pointer-events: none; }
+.site-header, .site-header * { pointer-events: auto; }
+.public-editorial-header, .public-editorial-header * { pointer-events: auto; }
+
 /* Keep the official VLibras markup as a bottom-left anchor. The plugin controls
    when the panel is visible; these rules only control its containing geometry. */
 html body [vw] {
@@ -1130,6 +1135,7 @@ html body .chat-head button { display: inline-flex; align-items: center; justify
 .public-gallery-page-grid button img { width: 100%; height: 100%; min-height: 270px; object-fit: cover; transition: transform .3s ease; }
 .public-gallery-page-grid button:hover img { transform: scale(1.035); }
 .public-gallery-page-grid button span { position: absolute; right: 0; bottom: 0; left: 0; display: grid; gap: 6px; padding: 22px 18px 16px; background: linear-gradient(transparent, rgba(4,22,56,.9)); color: white; }
+.public-gallery-page-grid button > * { pointer-events: none; }
 .public-gallery-page-grid button strong { font-size: 17px; }
 .public-gallery-page-grid button small { color: #d7e3f4; font-size: 12px; line-height: 1.35; }
 .gallery-lightbox { width: min(1080px, calc(100vw - 48px)); margin: 0; background: white; }
@@ -1376,6 +1382,17 @@ html body [class*="vpw-wrapper"] {
   background: var(--navy) !important;
 }
 
+.campaign-shell .gallery-grid .gallery-card,
+.campaign-shell .gallery-grid .gallery-card img,
+.campaign-shell .gallery-grid .gallery-card .gallery-overlay {
+  pointer-events: auto;
+}
+
+.campaign-shell .gallery-grid .gallery-card .gallery-overlay,
+.campaign-shell .gallery-grid .gallery-card .gallery-overlay * {
+  pointer-events: none;
+}
+
 html body div[vw].vlibras-widget:not(.active),
 html body div[vw][data-active="false"] {
   position: fixed !important;
@@ -1449,14 +1466,14 @@ html body #vlibras-access-wrapper {
 
 html body #vlibras-app-root {
   position: fixed !important;
-  left: 8px !important;
+  left: 76px !important;
   right: auto !important;
   top: auto !important;
-  bottom: 64px !important;
-  width: min(360px, calc(100vw - 16px)) !important;
-  height: min(560px, calc(100vh - 80px)) !important;
-  max-width: calc(100vw - 16px) !important;
-  max-height: calc(100vh - 80px) !important;
+  bottom: 16px !important;
+  width: min(380px, calc(100vw - 92px)) !important;
+  height: min(620px, calc(100vh - 32px)) !important;
+  max-width: calc(100vw - 92px) !important;
+  max-height: calc(100vh - 32px) !important;
   margin: 0 !important;
   transform: none !important;
   z-index: 2147483640 !important;
@@ -1487,11 +1504,11 @@ html body #vlibras-app-root {
   html body div[vw].vlibras-widget.active,
   html body div[vw][data-active="true"],
   html body #vlibras-app-root {
-    left: 8px !important;
-    bottom: 64px !important;
-    width: calc(100vw - 16px) !important;
-    height: min(560px, calc(100vh - 80px)) !important;
-    max-width: calc(100vw - 16px) !important;
-    max-height: calc(100vh - 80px) !important;
+    left: 76px !important;
+    bottom: 16px !important;
+    width: calc(100vw - 92px) !important;
+    height: min(560px, calc(100vh - 32px)) !important;
+    max-width: calc(100vw - 92px) !important;
+    max-height: calc(100vh - 32px) !important;
   }
 }

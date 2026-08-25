@@ -3,7 +3,28 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { defaultAgenda, defaultContent, defaultNews, type AgendaItem, type GalleryAlbum, type GalleryPhoto, type NewsItem, type ProposalCard, type SiteContent } from "../../lib/cms-defaults";
-import { publicMediaSrc } from "../../lib/public-media";
+import { mediaRevisionFor, publicMediaSrc } from "../../lib/public-media";
+
+function cmsMediaRevision(content: SiteContent, photos: GalleryPhoto[] = []) {
+  return mediaRevisionFor([
+    content.siteHeaderLogo,
+    content.siteFooterLogo,
+    content.digitalCardLogo,
+    content.santinhoLogo,
+    content.partyLightLogo,
+    content.partyDarkLogo,
+    content.ogImage,
+    content.heroImage,
+    content.storyImage,
+    content.santinhoImage,
+    content.galleryImage1,
+    content.galleryImage2,
+    content.galleryImage3,
+    content.galleryImage4,
+    content.galleryImage5,
+    ...photos.map((photo) => photo.image),
+  ]);
+}
 
 export function useCmsData() {
   const [content, setContent] = useState<SiteContent>(defaultContent);
@@ -12,7 +33,7 @@ export function useCmsData() {
   const [albums, setAlbums] = useState<GalleryAlbum[]>([]);
   const [photos, setPhotos] = useState<GalleryPhoto[]>([]);
   const [loading, setLoading] = useState(true);
-  const [mediaRevision, setMediaRevision] = useState(0);
+  const [mediaRevision, setMediaRevision] = useState(() => cmsMediaRevision(defaultContent));
   useEffect(() => {
     let disposed = false;
     const load = async () => {
@@ -21,12 +42,14 @@ export function useCmsData() {
         if (!response.ok || disposed) return;
         const payload = await response.json();
         if (!payload || disposed) return;
-        if (payload.content) setContent({ ...defaultContent, ...payload.content });
+        const nextContent = payload.content ? { ...defaultContent, ...payload.content } : defaultContent;
+        const nextPhotos = Array.isArray(payload.photos) ? payload.photos : [];
+        if (payload.content) setContent(nextContent);
         if (Array.isArray(payload.agenda)) setAgenda(payload.agenda);
         if (Array.isArray(payload.news)) setNews(payload.news);
         if (Array.isArray(payload.albums)) setAlbums(payload.albums);
-        if (Array.isArray(payload.photos)) setPhotos(payload.photos);
-        setMediaRevision(Date.now());
+        if (Array.isArray(payload.photos)) setPhotos(nextPhotos);
+        setMediaRevision(cmsMediaRevision(nextContent, nextPhotos));
       } catch { /* pages keep bundled defaults while the CMS is unavailable */ }
       finally { if (!disposed) setLoading(false); }
     };
@@ -113,5 +136,5 @@ export function GalleryPage() {
   const [albumId, setAlbumId] = useState("all");
   const [active, setActive] = useState<GalleryPhoto | null>(null);
   const visible = photos.filter((photo) => albumId === "all" || photo.albumId === albumId).sort((a, b) => `${b.publishedAt}-${b.sortOrder}`.localeCompare(`${a.publishedAt}-${a.sortOrder}`));
-  return <PublicFrame content={content} mediaRevision={mediaRevision} eyebrow={content.galleryEyebrow} title={content.galleryTitle} emphasis={content.galleryTitleEm} description={content.galleryDescription}><section className="public-gallery-toolbar"><button className={albumId === "all" ? "active" : ""} onClick={() => setAlbumId("all")}>Todos os registros</button>{albums.map((album) => <button className={albumId === album.id ? "active" : ""} onClick={() => setAlbumId(album.id)} key={album.id}>{album.title}</button>)}</section><section className="public-gallery-page-grid">{visible.map((photo) => <button key={photo.id} onClick={() => setActive({ ...photo, image: publicMediaSrc(photo.image, mediaRevision) })}><img src={publicMediaSrc(photo.image, mediaRevision)} alt={photo.alt} /><span><strong>{photo.title}</strong><small>{photo.caption}</small></span></button>)}</section>{active && <div className="modal-backdrop" role="dialog" aria-modal="true" onClick={() => setActive(null)}><button className="modal-close" onClick={() => setActive(null)} aria-label="Fechar imagem">×</button><figure className="gallery-lightbox"><img src={active.image} alt={active.alt} /><figcaption><strong>{active.title}</strong><span>{active.caption}</span></figcaption></figure></div>}</PublicFrame>;
+  return <PublicFrame content={content} mediaRevision={mediaRevision} eyebrow={content.galleryEyebrow} title={content.galleryTitle} emphasis={content.galleryTitleEm} description={content.galleryDescription}><section className="public-gallery-toolbar"><button type="button" className={albumId === "all" ? "active" : ""} onClick={() => setAlbumId("all")}>Todos os registros</button>{albums.map((album) => <button type="button" className={albumId === album.id ? "active" : ""} onClick={() => setAlbumId(album.id)} key={album.id}>{album.title}</button>)}</section><section className="public-gallery-page-grid">{visible.map((photo) => <button type="button" key={photo.id} onClick={() => setActive({ ...photo, image: publicMediaSrc(photo.image, mediaRevision) })}><img src={publicMediaSrc(photo.image, mediaRevision)} alt={photo.alt} /><span><strong>{photo.title}</strong><small>{photo.caption}</small></span></button>)}</section>{active && <div className="modal-backdrop" role="dialog" aria-modal="true" onClick={() => setActive(null)}><button type="button" className="modal-close" onClick={() => setActive(null)} aria-label="Fechar imagem">×</button><figure className="gallery-lightbox"><img src={active.image} alt={active.alt} /><figcaption><strong>{active.title}</strong><span>{active.caption}</span></figcaption></figure></div>}</PublicFrame>;
 }

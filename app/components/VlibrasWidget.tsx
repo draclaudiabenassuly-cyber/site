@@ -1,6 +1,6 @@
 "use client";
 
-import { createElement, useEffect } from "react";
+import { useEffect } from "react";
 
 declare global {
   interface Window {
@@ -171,14 +171,14 @@ function pinOpenedPanel() {
 
   const panelStyle = {
     position: "fixed",
-    left: "16px",
+    left: "76px",
     right: "auto",
     top: "auto",
-    bottom: "84px",
-    width: "min(380px, calc(100vw - 32px))",
-    height: "min(620px, calc(100vh - 100px))",
-    maxWidth: "calc(100vw - 32px)",
-    maxHeight: "calc(100vh - 100px)",
+    bottom: "16px",
+    width: "min(380px, calc(100vw - 92px))",
+    height: "min(620px, calc(100vh - 32px))",
+    maxWidth: "calc(100vw - 92px)",
+    maxHeight: "calc(100vh - 32px)",
     margin: "0",
     transform: "none",
     zIndex: "2147483640",
@@ -190,14 +190,14 @@ function pinOpenedPanel() {
   addShadowStyle(root, "claudia-vlibras-panel-style", `
     :host {
       position: fixed !important;
-      left: 16px !important;
+      left: 76px !important;
       right: auto !important;
       top: auto !important;
-      bottom: 84px !important;
-      width: min(380px, calc(100vw - 32px)) !important;
-      height: min(620px, calc(100vh - 100px)) !important;
-      max-width: calc(100vw - 32px) !important;
-      max-height: calc(100vh - 100px) !important;
+      bottom: 16px !important;
+      width: min(380px, calc(100vw - 92px)) !important;
+      height: min(620px, calc(100vh - 32px)) !important;
+      max-width: calc(100vw - 92px) !important;
+      max-height: calc(100vh - 32px) !important;
       margin: 0 !important;
       transform: none !important;
       z-index: 2147483640 !important;
@@ -205,14 +205,14 @@ function pinOpenedPanel() {
     #vlibras-app {
       position: fixed !important;
       top: auto !important;
-      left: 16px !important;
+      left: 76px !important;
       right: auto !important;
-      bottom: 84px !important;
+      bottom: 16px !important;
       transform: none !important;
-      width: min(380px, calc(100vw - 32px)) !important;
-      height: min(620px, calc(100vh - 100px)) !important;
-      max-width: calc(100vw - 32px) !important;
-      max-height: calc(100vh - 100px) !important;
+      width: min(380px, calc(100vw - 92px)) !important;
+      height: min(620px, calc(100vh - 32px)) !important;
+      max-width: calc(100vw - 92px) !important;
+      max-height: calc(100vh - 32px) !important;
       margin: 0 !important;
       z-index: 2147483640 !important;
     }
@@ -226,13 +226,13 @@ function pinOpenedPanel() {
 function pinDetachedPanels() {
   const panelStyle = {
     position: "fixed",
-    left: "16px",
+    left: "76px",
     right: "auto",
     top: "auto",
-    bottom: "84px",
-    width: "min(380px, calc(100vw - 32px))",
-    maxWidth: "calc(100vw - 32px)",
-    maxHeight: "calc(100vh - 100px)",
+    bottom: "16px",
+    width: "min(380px, calc(100vw - 92px))",
+    maxWidth: "calc(100vw - 92px)",
+    maxHeight: "calc(100vh - 32px)",
     margin: "0",
     transform: "none",
     zIndex: "2147483640",
@@ -312,10 +312,7 @@ export default function VlibrasWidget() {
     };
   }, []);
 
-  return createElement(
-    "div",
-    { vw: "", className: "enabled", "data-claudia-vlibras": "true" },
-    createElement("div", { "vw-access-button": "", className: "active" }),
-    createElement("div", { "vw-plugin-wrapper": "" }, createElement("div", { className: "vw-plugin-top-wrapper" })),
-  );
+  // The official player creates its own shadow hosts. Rendering the legacy
+  // [vw] container here creates a second button and an invisible click layer.
+  return null;
 }

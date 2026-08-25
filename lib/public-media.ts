@@ -10,3 +10,10 @@ export function publicMediaSrc(value: string, revision = 0) {
   const separator = value.includes("?") ? "&" : "?";
   return `${value}${separator}cms_revision=${revision}`;
 }
+
+export function mediaRevisionFor(values: Array<string | undefined>) {
+  const mediaValues = values.filter((value): value is string => Boolean(value)).sort().join("|");
+  let hash = 0;
+  for (const character of mediaValues) hash = (hash * 31 + character.charCodeAt(0)) | 0;
+  return Math.abs(hash) || 1;
+}

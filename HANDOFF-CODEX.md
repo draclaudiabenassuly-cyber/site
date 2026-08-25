@@ -113,3 +113,87 @@ O retorno deve conter as cinco imagens da galeria, o `proposalsJson` com os quat
 - O cadastro de e-mails é salvo sem Resend. Para receber avisos automáticos,
   ainda é necessário configurar `RESEND_API_KEY` e `RESEND_FROM_EMAIL` nos
   secrets da função `cms-api`.
+
+## Correções de interface em 25/08/2026
+
+- O componente `app/components/VlibrasWidget.tsx` deixou de renderizar o
+  contêiner legado `[vw]`. O player oficial já cria seus próprios hosts; manter
+  os dois criava um segundo botão e uma camada invisível que bloqueava os
+  cliques do CMS.
+- O painel do VLibras foi reposicionado para abrir ao lado do botão, no canto
+  inferior esquerdo, preservando Hosana como avatar inicial.
+- O texto sobreposto `Vote 2323` da abertura foi removido de `app/page.tsx`.
+- A migração `supabase/migrations/20260824100000_hero_image_correction.sql`
+  restaura a foto vertical aprovada `/campaign/claudia-portrait-clean.jpg` no
+  campo `heroImage`. A correção também foi aplicada no projeto Supabase
+  `ubzgxmxroeygdukjsinh`.
+- Antes da publicação desta correção, o DOM da home tinha simultaneamente um
+  contêiner `[vw]` e o host oficial `#vlibras-access-wrapper`; o primeiro
+  confirmadamente interceptava os cliques da barra lateral do `/admin`.
+
+## Registro completo da retomada em 25/08/2026
+
+### Pedidos relatados pela equipe
+
+- Recuperar o contexto perdido quando a sessÃ£o do Codex foi encerrada duas vezes.
+- Trabalhar sempre na conta/perfil autenticado da ClÃ¡udia no GitHub, Vercel e
+  Supabase, sem alterar o perfil pessoal do Douglas.
+- Colocar o site prÃ³prio online em `https://claudiabenassuly.com.br/` com Vercel
+  e Supabase.
+- Manter o CMS funcional, com cadastro, agenda, notÃ­cias, galeria e campos
+  editoriais sincronizados.
+- Corrigir o VLibras duplicado, o painel abrindo no topo/cortado e o avatar
+  inicial; o combinado Ã© um Ãºnico botÃ£o no canto inferior esquerdo, painel ao
+  lado e avatar feminino Hosana.
+- Corrigir a foto inicial da home para o retrato vertical emoldurado, sem o
+  pisca-pisca entre a foto correta e a paisagem antiga.
+- Remover o texto `Vote 2323` que aparecia sobre a imagem da seÃ§Ã£o do santinho.
+- Corrigir botÃµes que apareciam como nÃ£o clicÃ¡veis: CMS, abrir santinho, cards
+  de notÃ­cias e cards da galeria.
+- Corrigir a galeria da home e a pÃ¡gina completa `/galeria`: abertura lenta,
+  cards que demoravam a responder ao hover/clique e os dois filtros que
+  alternavam entre clicÃ¡veis e nÃ£o clicÃ¡veis.
+- Corrigir menus da home e das pÃ¡ginas internas que alternavam entre clicÃ¡veis
+  e nÃ£o clicÃ¡veis.
+- Em todos os menus, a logo deve levar para a pÃ¡gina inicial `/`; na home, ela
+  retorna ao topo da prÃ³pria pÃ¡gina.
+- Registrar este histÃ³rico no projeto para que o contexto nÃ£o seja perdido de
+  novo.
+
+### CorreÃ§Ãµes feitas nesta retomada
+
+- Removido o contÃªiner JSX legado `[vw]` do `VlibrasWidget`; ele criava o segundo
+  botÃ£o e uma Ã¡rea invisÃ­vel sobre a pÃ¡gina. O widget oficial permanece como a
+  Ãºnica instÃ¢ncia.
+- Reposicionado o painel oficial do VLibras para `left: 76px` e `bottom: 16px`,
+  com dimensÃµes responsivas ao lado do botÃ£o inferior esquerdo.
+- Removido o chip visual `Vote 2323` da arte da seÃ§Ã£o do santinho em
+  `app/page.tsx`. A numeraÃ§Ã£o continua nos locais oficiais do site, como faixa,
+  FAQ, rodapÃ© e a prÃ³pria arte quando jÃ¡ fizer parte da imagem.
+- Mantida a migraÃ§Ã£o `20260824100000_hero_image_correction.sql`, que troca o
+  valor legado de `heroImage` pela foto aprovada
+  `/campaign/claudia-portrait-clean.jpg`; a instruÃ§Ã£o SQL jÃ¡ foi executada no
+  Supabase da ClÃ¡udia.
+- A chave de cache das imagens deixou de usar `Date.now()` em cada foco/intervalo.
+  Agora ela Ã© determinÃ­stica pelo conjunto de imagens, impedindo que a galeria
+  seja recarregada enquanto a pessoa passa o mouse ou abre uma foto.
+- Os cards da galeria da home, os filtros da `/galeria` e os cards de fotos da
+  pÃ¡gina completa usam `type="button"`; as camadas internas nÃ£o capturam mais o
+  ponteiro antes do elemento clicÃ¡vel.
+- Os cards de notÃ­cias da home continuam abrindo o modal pelo clique e agora
+  tambÃ©m respondem a Enter/EspaÃ§o; imagem e texto interno nÃ£o bloqueiam o evento.
+- O ajuste do overlay legado corrige por consequÃªncia o painel CMS, o link
+  `Abrir santinho digital`, os menus, os filtros e os cards localizados na regiÃ£o
+  inferior da janela.
+
+### VerificaÃ§Ã£o e estado de publicaÃ§Ã£o
+
+- `npm.cmd run build` passou apÃ³s as correÃ§Ãµes: TypeScript passou, 17 rotas
+  foram geradas e nÃ£o houve erro de compilaÃ§Ã£o.
+- `git diff --check` passou; os avisos restantes sÃ£o apenas sobre a conversÃ£o
+  de fim de linha CRLF do Windows.
+- Antes do novo deploy, o site pÃºblico ainda mostra a versÃ£o anterior. O texto
+  `Vote 2323` continuarÃ¡ visÃ­vel no navegador atÃ© a nova implantaÃ§Ã£o entrar no ar.
+- Depois do push/deploy, validar na conta da ClÃ¡udia: home, `/galeria`,
+  `/noticias`, `/santinho`, `/admin`, um card de foto, cada filtro, um card de
+  notÃ­cia, `Abrir santinho digital`, menus e o VLibras.
