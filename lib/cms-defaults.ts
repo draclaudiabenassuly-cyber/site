@@ -253,7 +253,7 @@ export const defaultContent: SiteContent = {
   footerExploreLabel: "Explore",
   footerConnectLabel: "Conecte-se",
   signupRecipientEmail: "draclaudiabenassuly@gmail.com",
-  whatsappNumber: "",
+  whatsappNumber: "5591920038651",
   whatsappButtonLabel: "Fale com a campanha",
   whatsappMessageCampaign: "Olá Cláudia Benassuly, quero conhecer a campanha.",
   whatsappMessageMore: "Olá Cláudia Benassuly, quero saber mais sobre a campanha.",

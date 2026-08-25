@@ -260,9 +260,8 @@ O retorno deve conter as cinco imagens da galeria, o `proposalsJson` com os quat
   primeiro clique.
 - WhatsApp foi centralizado em `lib/campaign-contact.ts`. Home, rodapés,
   compromissos, menu, Santinho e balões usam as mesmas mensagens e o número
-  configurado no CMS. O número real não foi encontrado no projeto, no segundo
-  cérebro nem no conteúdo público atual; continua pendente informar DDI + DDD
-  para que o destino deixe de usar o fallback sem número.
+  configurado no CMS. O número oficial recebido da campanha é
+  `91 9 2003-8651`, salvo no formato público `5591920038651`.
 - O novo menu `/admin` > `Contato e bot` permite editar número, texto do
   botão flutuante e as três mensagens de WhatsApp. A mesma seção possui CRUD
   de perguntas e respostas da Cláudia Digital, com palavras-chave, resposta,
