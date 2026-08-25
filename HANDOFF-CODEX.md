@@ -1,5 +1,25 @@
 # Handoff para o Codex
 
+## Correcao final do VLibras - 25/08/2026
+
+- A causa do carregamento infinito era CORS: o player Unity do VLibras
+  redirecionava os arquivos WASM para o jsDelivr e o navegador bloqueava as
+  requisicoes. O canvas ficava no tamanho padrao e mostrava apenas o splash.
+- Foi criada a rota restrita `app/api/vlibras/unity/[...path]/route.ts`. Ela
+  serve somente os sete arquivos necessarios do player, com MIME correto, sem
+  funcionar como proxy aberto.
+- `app/components/VlibrasWidget.tsx` aponta o iframe para
+  `/api/vlibras/unity/index.html` e reaplica essa URL se o widget recriar o
+  iframe. O avatar feminino Hosana continua como padrao.
+- O painel fica fechado ate o clique, abre ao lado do unico botao e permanece
+  ancorado na base. Desktop: `left: 76px`, `bottom: 16px`, altura 440px.
+  Mobile: `left: 68px`, `bottom: 16px`, largura maxima 300px.
+- Validacao publicada: desktop 1366x641 com botao x=16/y=569 e painel
+  x=76/y=185; mobile 390x844 com botao x=16/y=780 e painel x=68/y=388.
+  O canvas Unity carregou nos dois tamanhos e o avatar apareceu sem CORS.
+- Commits: `67207e2`, `4a351cb`, `fc3adb2`, `6318740`, `d2b41be` e `ebe4880`.
+  `npm.cmd run build` passou com TypeScript e 17 rotas.
+
 ## Envio e newsletter pelo Resend - 24/08/2026
 
 - A Edge Function `supabase/functions/cms-api/index.ts` envia as notificacoes
