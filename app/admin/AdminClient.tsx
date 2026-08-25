@@ -158,7 +158,33 @@ function ContentEditor({ tab, content, saving, onChange, onSave, onRefresh }: { 
 function GeneralContentEditor({ content, saving, onChange, onSave, onRefresh }: { content: SiteContent; saving: boolean; onChange: (key: keyof SiteContent, value: string) => void; onSave: (key: keyof SiteContent) => Promise<void>; onRefresh: () => Promise<void> }) { return <section className="cms-panel"><div className="cms-panel-heading"><div><p className="eyebrow">Edição por seção</p><h2>Textos gerais do site</h2><p className="cms-panel-description">Agenda, coligação, notícias, galeria e rodapé ficam organizados aqui, sem misturar com o santinho.</p></div><button className="outline-button small" onClick={() => void onRefresh()}>Atualizar</button></div><div className="cms-content-grid">{commonFields.map((field) => <EditableField key={field.key} field={field} content={content} saving={saving} onChange={onChange} onSave={onSave} />)}</div></section>; }
 
 function EmailSettings({ content, saving, onChange, onSave, onTest }: { content: SiteContent; saving: boolean; onChange: (key: keyof SiteContent, value: string) => void; onSave: (key: keyof SiteContent) => Promise<void>; onTest: () => Promise<void> }) {
-  return <section className="cms-panel"><div className="cms-panel-heading"><div><p className="eyebrow">Recebimento dos cadastros</p><h2>Configuração de e-mail</h2><p className="cms-panel-description">Os cadastros continuam sendo salvos no Supabase. Esta configuração define para qual caixa o servidor envia a notificação.</p></div><button className="outline-button small" onClick={() => void onTest()} disabled={saving}>Enviar e-mail de teste</button></div><div className="cms-content-grid"><EditableField field={{ key: "signupRecipientEmail", label: "E-mail que recebe os cadastros", hint: "Use a conta Gmail da campanha e salve este campo." }} content={content} saving={saving} onChange={onChange} onSave={onSave} /></div><div className="cms-email-help"><h3>Mini tutorial para deixar o Gmail recebendo</h3><ol><li>Confira se o destinatário acima está como <strong>draclaudiabenassuly@gmail.com</strong> e salve o campo.</li><li>O Gmail será a caixa de recebimento. O disparo é feito com segurança pelo servidor, sem colocar senha do Gmail no site.</li><li>Crie uma conta no Resend, gere uma API key e verifique o endereço ou domínio que será usado como remetente.</li><li>No Supabase, abra <strong>Edge Functions &gt; cms-api &gt; Secrets</strong> e adicione <code>RESEND_API_KEY</code> e <code>RESEND_FROM_EMAIL</code>. Use como remetente um endereço verificado no Resend.</li><li>Publique novamente a função <strong>cms-api</strong>. Depois volte aqui e clique em <strong>Enviar e-mail de teste</strong>.</li><li>No Gmail, confira a Caixa de entrada e o Spam. Se quiser, crie um filtro para mensagens com o assunto “Novo cadastro no site da campanha”.</li></ol><p><strong>Importante:</strong> nunca coloque a API key, a senha do Gmail ou a chave de serviço do Supabase em campos públicos, em variáveis <code>NEXT_PUBLIC_*</code> ou no código do navegador.</p></div></section>;
+  return (
+    <section className="cms-panel">
+      <div className="cms-panel-heading">
+        <div>
+          <p className="eyebrow">Recebimento dos cadastros</p>
+          <h2>Configuração de e-mail</h2>
+          <p className="cms-panel-description">Os cadastros continuam sendo salvos no Supabase. Esta configuração define para qual caixa o servidor envia a notificação.</p>
+        </div>
+        <button type="button" className="outline-button small" onClick={() => void onTest()} disabled={saving}>Enviar e-mail de teste</button>
+      </div>
+      <div className="cms-content-grid">
+        <EditableField field={{ key: "signupRecipientEmail", label: "E-mail que recebe os cadastros", hint: "Use a conta Gmail da campanha e salve este campo." }} content={content} saving={saving} onChange={onChange} onSave={onSave} />
+      </div>
+      <div className="cms-email-help">
+        <h3>Mini tutorial para deixar o Gmail recebendo</h3>
+        <ol>
+          <li>Confira se o destinatário acima está como <strong>draclaudiabenassuly@gmail.com</strong> e salve o campo. Depois, <a href="https://mail.google.com/" target="_blank" rel="noreferrer">abra o Gmail</a> para conferir a caixa de recebimento.</li>
+          <li>O Gmail será a caixa de recebimento. O disparo é feito com segurança pelo servidor, sem colocar senha do Gmail no site.</li>
+          <li>Se ainda não tiver conta, <a href="https://resend.com/signup" target="_blank" rel="noreferrer">crie a conta no Resend</a>. Depois abra <a href="https://resend.com/api-keys" target="_blank" rel="noreferrer">API Keys</a> para gerar a chave e <a href="https://resend.com/domains" target="_blank" rel="noreferrer">Domains</a> para verificar o endereço ou domínio remetente.</li>
+          <li>No projeto da Cláudia, abra <a href="https://supabase.com/dashboard/project/ubzgxmxroeygdukjsinh/functions" target="_blank" rel="noreferrer"><strong>Edge Functions</strong></a> no Supabase, entre em <strong>cms-api</strong> e use <a href="https://supabase.com/dashboard/project/ubzgxmxroeygdukjsinh/settings/functions" target="_blank" rel="noreferrer"><strong>Secrets</strong></a> para adicionar <code>RESEND_API_KEY</code> e <code>RESEND_FROM_EMAIL</code>. Use como remetente um endereço verificado no Resend.</li>
+          <li>Na tela da função <strong>cms-api</strong>, publique novamente a função. Depois volte aqui e clique em <strong>Enviar e-mail de teste</strong>.</li>
+          <li>No Gmail, confira a Caixa de entrada e o Spam. Se quiser, <a href="https://mail.google.com/mail/u/0/#settings/filters" target="_blank" rel="noreferrer">crie um filtro</a> para mensagens com o assunto “Novo cadastro no site da campanha”.</li>
+        </ol>
+        <p><strong>Importante:</strong> nunca coloque a API key, a senha do Gmail ou a chave de serviço do Supabase em campos públicos, em variáveis <code>NEXT_PUBLIC_*</code> ou no código do navegador.</p>
+      </div>
+    </section>
+  );
 }
 
 function EditableField({ field, content, saving, onChange, onSave }: { field: FieldDef; content: SiteContent; saving: boolean; onChange: (key: keyof SiteContent, value: string) => void; onSave: (key: keyof SiteContent) => Promise<void> }) { return <label className="cms-field"><span>{field.label}</span>{field.area ? <textarea value={String(content[field.key] ?? "")} onChange={(event) => onChange(field.key, event.target.value)} /> : <input value={String(content[field.key] ?? "")} onChange={(event) => onChange(field.key, event.target.value)} />}<button type="button" onClick={() => void onSave(field.key)} disabled={saving}>{saving ? "Salvando..." : "Salvar este campo"}</button>{field.hint && <small>{field.hint}</small>}</label>; }
