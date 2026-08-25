@@ -282,6 +282,14 @@ function pinOpenedPanel() {
       transition: none !important;
       z-index: 2147483640 !important;
     }
+    #vlibras-app-content {
+      opacity: 1 !important;
+      visibility: visible !important;
+    }
+    #vlibras-app-content iframe {
+      opacity: 1 !important;
+      visibility: visible !important;
+    }
     #vlibras-app {
       position: fixed !important;
       top: auto !important;
