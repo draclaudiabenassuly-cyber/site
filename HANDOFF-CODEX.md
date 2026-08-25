@@ -197,3 +197,24 @@ O retorno deve conter as cinco imagens da galeria, o `proposalsJson` com os quat
 - Depois do push/deploy, validar na conta da ClÃ¡udia: home, `/galeria`,
   `/noticias`, `/santinho`, `/admin`, um card de foto, cada filtro, um card de
   notÃ­cia, `Abrir santinho digital`, menus e o VLibras.
+
+## PublicaÃ§Ã£o e novos testes em 25/08/2026
+
+- A Vercel concluiu o commit `abb6514` como `Ready` no projeto da ClÃ¡udia.
+- O domÃ­nio personalizado estava associado ao projeto antigo `site`, por isso
+  continuava mostrando o bundle anterior mesmo com o novo deploy pronto.
+- `claudiabenassuly.com.br` foi movido na Vercel para
+  `draclaudiabenassuly-cyber-site`; o apex redireciona para
+  `www.claudiabenassuly.com.br` com 308.
+- No domÃ­nio pÃºblico corrigido, a home foi testada com: zero hosts legados do
+  VLibras, um host oficial, retrato vertical correto, sem `.hero-number`, sem
+  `.card-chip`, cinco cards de galeria e trÃªs cards de notÃ­cias com evento.
+- O botÃ£o `ConheÃ§a as propostas` foi testado e levou a `#propostas` com o alvo
+  no topo da viewport.
+- Os cinco cards da galeria da home abriram o modal no primeiro clique; os dois
+  filtros de `/galeria` alternaram e o card filtrado abriu o lightbox.
+- Os cards de notÃ­cias da home abriram o modal. Os cards de `/noticias` tambÃ©m
+  passaram a abrir um modal, com suporte a clique, Enter e EspaÃ§o.
+- A auditoria final ainda inclui o CRUD completo do CMS, o retorno da logo para
+  `/` em todos os menus e a conferÃªncia dos metadados Open Graph/Twitter para
+  compartilhamento no WhatsApp e nas redes sociais.

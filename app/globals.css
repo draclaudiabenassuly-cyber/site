@@ -807,7 +807,8 @@ div[vw].vlibras-widget [vw-access-button], div[vw-access-button].active { left: 
 .public-agenda-card p, .public-news-card p { max-width: 640px; margin: 0; color: var(--muted); font-size: 16px; line-height: 1.6; }
 .public-agenda-card > a { color: var(--navy); font-size: 11px; font-weight: 800; letter-spacing: .08em; text-decoration: none; text-transform: uppercase; }
 .public-news-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-.public-news-card { overflow: hidden; border: 1px solid #d4deea; background: white; scroll-margin-top: 24px; }
+.public-news-card { cursor: pointer; overflow: hidden; border: 1px solid #d4deea; background: white; scroll-margin-top: 24px; }
+.public-news-card > * { pointer-events: none; }
 .public-news-image { height: 240px; background: var(--navy); }
 .public-news-image img { width: 100%; height: 100%; object-fit: cover; }
 .public-news-card > div:last-child { padding: 22px; }
