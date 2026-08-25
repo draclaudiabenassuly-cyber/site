@@ -265,7 +265,7 @@ export default function SantinhoPage() {
               <p>{siteContent.santinhoBody}</p>
               <div className="santinho-vote-number"><span>Confirme na urna</span><strong>{siteContent.candidateNumber}</strong></div>
               <div className="party-card-lockup"><span>Partido:</span><img src={publicMediaSrc(siteContent.partyDarkLogo, cmsRevision)} alt={`${siteContent.partyName} 23`} /></div>
-              <div className="santinho-coalition" aria-label="Coligação informada pela campanha">
+              <div id="coligacao" className="santinho-coalition" aria-label="Coligação informada pela campanha">
                 <span className="santinho-coalition-label">Coligação · {siteContent.coalitionName}</span>
                 <div className="santinho-coalition-list">
                   <span>Governador <b>{siteContent.coalitionGovernorName} {siteContent.coalitionGovernorNumber}</b></span>
