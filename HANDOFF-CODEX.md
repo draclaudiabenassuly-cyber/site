@@ -90,3 +90,26 @@ O retorno deve conter as cinco imagens da galeria, o `proposalsJson` com os quat
   restaura os padrões versionados.
 - Para imagens muito grandes, use Supabase Storage ou reduza a imagem antes de
   salvar; a Edge Function limita data URLs a 900 KB.
+
+## Estado da publicação em 24/08/2026
+
+- O build local passou com `npm.cmd run build`, incluindo TypeScript e as 17
+  páginas/rotas do Next.
+- O deployment de produção da Vercel baseado no commit `39593f0` terminou como
+  `Ready` no projeto `draclaudiabenassuly-cyber-site`, dentro da conta da
+  Cláudia.
+- Foram configuradas na Vercel, em Production, as variáveis públicas
+  `NEXT_PUBLIC_SUPABASE_URL` e `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, seguidas
+  de um redeploy concluído com sucesso.
+- No projeto Supabase `ubzgxmxroeygdukjsinh`, as migrações de schema e de
+  correção de conteúdo/galeria foram executadas com sucesso.
+- A função existente `cms-api` respondeu no site publicado com o conteúdo do
+  banco, incluindo 5 fotos da galeria, 3 compromissos e os textos corrigidos.
+- Verificação no domínio `https://claudiabenassuly.com.br/`: home, galeria,
+  agenda, notícias, VLibras e formulário estão presentes; `/admin` abriu o CMS
+  autenticado e exibiu 91 campos, 5 fotos e 3 compromissos.
+- O login demonstrativo `admin@admin.com` / `admin12$` ainda deve ser trocado
+  pela equipe antes de divulgar o acesso administrativo.
+- O cadastro de e-mails é salvo sem Resend. Para receber avisos automáticos,
+  ainda é necessário configurar `RESEND_API_KEY` e `RESEND_FROM_EMAIL` nos
+  secrets da função `cms-api`.
