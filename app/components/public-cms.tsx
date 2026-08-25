@@ -5,6 +5,7 @@ import Link from "next/link";
 import { defaultAgenda, defaultContent, defaultNews, type AgendaItem, type GalleryAlbum, type GalleryPhoto, type NewsItem, type ProposalCard, type SiteContent } from "../../lib/cms-defaults";
 import { mediaRevisionFor, publicMediaSrc } from "../../lib/public-media";
 import CampaignContactTools from "./CampaignContactTools";
+import CampaignHeader from "./CampaignHeader";
 import { campaignWhatsAppLink, whatsappMessages } from "../../lib/campaign-contact";
 
 function cmsMediaRevision(content: SiteContent, photos: GalleryPhoto[] = []) {
@@ -84,9 +85,7 @@ export function parseGallery(content: SiteContent) {
 }
 
 export function PublicHeader({ content, mediaRevision = 0 }: { content: SiteContent; mediaRevision?: number }) {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const closeMenu = () => setMenuOpen(false);
-  return <header className="public-editorial-header"><Link href="/" className="public-editorial-brand" onClick={closeMenu}><img src={publicMediaSrc(content.siteHeaderLogo, mediaRevision)} alt="Cláudia Benassuly" /></Link><button type="button" className="public-mobile-menu" onClick={() => setMenuOpen((value) => !value)} aria-expanded={menuOpen} aria-controls="public-main-navigation"><span /><span /><span /><b>{menuOpen ? "Fechar" : "Menu"}</b></button><nav id="public-main-navigation" className={menuOpen ? "is-open" : ""} aria-label="Navegação principal"><Link href="/historia" onClick={closeMenu}>A história</Link><Link href="/propostas" onClick={closeMenu}>Propostas</Link><Link href="/compromissos" onClick={closeMenu}>Compromissos</Link><Link href="/noticias" onClick={closeMenu}>Notícias</Link><Link href="/galeria" onClick={closeMenu}>Galeria</Link><Link href="/santinho" onClick={closeMenu}>Santinho digital</Link><a className="public-mobile-contact" href={campaignWhatsAppLink(content.whatsappMessageCampaign || whatsappMessages.campaign, content.whatsappNumber)} target="_blank" rel="noreferrer" onClick={closeMenu}>{content.whatsappButtonLabel || "Fale com a campanha"} ↗</a></nav><Link href="/" className="public-editorial-back" onClick={closeMenu}>Voltar à home</Link></header>;
+  return <CampaignHeader content={content} mediaRevision={mediaRevision} className="public-route-header" />;
 }
 
 export function PublicFooter({ content, mediaRevision = 0 }: { content: SiteContent; mediaRevision?: number }) {

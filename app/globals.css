@@ -1554,3 +1554,92 @@ html body #vlibras-app-root {
     max-height: calc(100dvh - 96px) !important;
   }
 }
+
+/* Shared campaign header: Home and public pages use the same mobile menu. */
+.public-route-header {
+  position: sticky;
+  top: 0;
+  left: auto;
+  right: auto;
+  width: calc(100% - 64px);
+  height: 90px;
+  padding: 0;
+  background: transparent;
+}
+
+.mobile-menu {
+  position: relative;
+  z-index: 2;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+}
+
+.main-nav {
+  z-index: 3;
+}
+
+.main-nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+
+.public-editorial-page {
+  min-width: 0;
+  overflow-x: clip;
+}
+
+.public-gallery-page-grid {
+  width: 100%;
+  min-width: 0;
+}
+
+.public-gallery-page-grid button {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.public-gallery-page-grid button span,
+.public-gallery-page-grid button strong,
+.public-gallery-page-grid button small {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 680px) {
+  .mobile-menu {
+    display: flex;
+  }
+
+  .public-route-header {
+    top: 0;
+    width: calc(100% - 40px);
+    height: 76px;
+    padding: 0;
+  }
+
+  .public-route-header .main-nav {
+    top: 65px;
+    right: 0;
+    width: min(290px, calc(100vw - 40px));
+  }
+
+  .public-gallery-page-grid {
+    grid-template-columns: minmax(0, 1fr);
+    max-width: 100%;
+    padding-right: 20px;
+    padding-left: 20px;
+  }
+
+  .public-gallery-page-grid button {
+    width: 100%;
+    min-width: 0;
+  }
+}

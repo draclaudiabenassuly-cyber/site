@@ -1,5 +1,23 @@
 # Handoff para o Codex
 
+## Menu mobile e galeria responsiva - 25/08/2026
+
+- Home e todas as paginas publicas agora usam o componente compartilhado
+  `app/components/CampaignHeader.tsx`.
+- O menu interno antigo foi removido do fluxo publico. Existe um unico botao
+  mobile, com area de toque de 44px, menu fechado ao carregar e abertura no
+  primeiro toque em `/`, `/historia`, `/propostas`, `/compromissos`,
+  `/noticias`, `/galeria` e `/santinho`.
+- Os links do menu fecham o menu ao navegar e a logo leva para a Home em todas
+  as paginas.
+- A pagina `/galeria` passou a limitar a largura dos cards com
+  `minmax(0, 1fr)`, `min-width: 0` e `box-sizing: border-box`. Em viewport
+  mobile de 390px, os cards ficaram com 335px, sem overflow horizontal.
+- Validacao local: `npm.cmd run build` passou com TypeScript e 17 rotas.
+  Playwright validou mobile 390x844 em todas as paginas publicas, clique do
+  menu no primeiro toque, navegacao pelo item “A historia”, abertura do card
+  da galeria e desktop 1440x900 sem overflow.
+
 ## Correcao final do VLibras - 25/08/2026
 
 - A causa do carregamento infinito era CORS: o player Unity do VLibras

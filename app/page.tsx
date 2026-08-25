@@ -4,6 +4,7 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import { defaultContent, type GalleryPhoto, type SiteContent } from "../lib/cms-defaults";
 import { mediaRevisionFor as stableMediaRevision, publicMediaSrc } from "../lib/public-media";
 import { campaignWhatsAppLink, whatsappMessages } from "../lib/campaign-contact";
+import CampaignHeader from "./components/CampaignHeader";
 
 type AgendaItem = {
   id?: string;
@@ -353,14 +354,6 @@ function PolicyIcon({ type }: { type: string }) {
   );
 }
 
-function MenuIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M4 7h16M4 12h16M4 17h16" />
-    </svg>
-  );
-}
-
 function ChatIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -389,7 +382,6 @@ function TikTokIcon() {
 }
 
 export default function Home() {
-  const [mobileMenu, setMobileMenu] = useState(false);
   const [activePost, setActivePost] = useState<Post | null>(null);
   const [activePhoto, setActivePhoto] = useState<string | null>(null);
   const [chatOpen, setChatOpen] = useState(false);
@@ -465,7 +457,6 @@ export default function Home() {
   }, [siteContent.proposalsJson]);
 
   function scrollTo(id: string) {
-    setMobileMenu(false);
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
@@ -540,25 +531,7 @@ export default function Home() {
         <span className="ribbon-end">{siteContent.partyName} 23</span>
       </div>
 
-      <header className="site-header">
-        <button type="button" className="brand-lockup" onClick={() => scrollTo("inicio")} aria-label="Voltar para o início">
-          <img src={publicMediaSrc(siteContent.siteHeaderLogo, cmsRevision)} alt="Cláudia Benassuly" />
-        </button>
-        <nav className={mobileMenu ? "main-nav open" : "main-nav"} aria-label="Navegação principal">
-          <a href="/historia">A história</a>
-          <a href="/propostas">Propostas</a>
-          <a href="/compromissos">Compromissos</a>
-          <a href="/noticias">Notícias</a>
-          <a href="/galeria">Galeria</a>
-          <a href="/santinho">Santinho digital</a>
-          <a className="nav-contact" href={whatsappLink} target="_blank" rel="noreferrer">
-            Fale com a campanha <ArrowUpRight />
-          </a>
-        </nav>
-        <button type="button" className="mobile-menu" onClick={() => setMobileMenu((value) => !value)} aria-label="Abrir menu">
-          <MenuIcon />
-        </button>
-      </header>
+      <CampaignHeader content={siteContent} mediaRevision={cmsRevision} />
 
       <section id="inicio" className="hero-section">
         <div className="hero-gridline gridline-one" />
