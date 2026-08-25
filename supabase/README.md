@@ -1,5 +1,14 @@
 # CMS da campanha no Supabase
 
+## Envio direto pelo Gmail
+
+A funcao `cms-api` aceita os secrets `GMAIL_SMTP_USER` e
+`GMAIL_SMTP_APP_PASSWORD`. A senha deve ser uma senha de app criada em
+`https://myaccount.google.com/apppasswords`, nunca a senha normal do Gmail.
+Quando esses dois secrets existem, o envio usa `smtp.gmail.com` por TLS. O
+Resend permanece como fallback opcional com `RESEND_API_KEY` e
+`RESEND_FROM_EMAIL`.
+
 Este diretório contém a migração, os dados iniciais e a Edge Function usados
 pela aplicação Next.js hospedada na Vercel.
 

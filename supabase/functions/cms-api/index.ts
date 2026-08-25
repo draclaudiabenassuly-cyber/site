@@ -59,20 +59,49 @@ async function signupRecipient() {
   return validEmail(value) ? value : DEFAULT_SIGNUP_RECIPIENT;
 }
 
+async function sendWithGmail(recipient: string, subject: string, html: string, text: string) {
+  const user = Deno.env.get("GMAIL_SMTP_USER")?.trim().toLowerCase();
+  const appPassword = Deno.env.get("GMAIL_SMTP_APP_PASSWORD")?.trim();
+  if (!user || !appPassword) return null;
+
+  try {
+    const nodemailerModule = await import("npm:nodemailer@9");
+    const nodemailer = nodemailerModule.default ?? nodemailerModule;
+    const transport = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 465,
+      secure: true,
+      auth: { user, pass: appPassword },
+    });
+    await transport.sendMail({ from: user, to: recipient, subject, html, text });
+    return { sent: true, provider: "gmail" };
+  } catch (error) {
+    console.error("Gmail SMTP error", error instanceof Error ? error.message : error);
+    return { sent: false, reason: "O Gmail recusou o envio. Confira a senha de app e a verificacao em duas etapas." };
+  }
+}
+
 async function sendSignupEmail(recipient: string, email: string, test = false) {
-  const apiKey = Deno.env.get("RESEND_API_KEY")?.trim();
-  if (!apiKey) return { sent: false, reason: "RESEND_API_KEY nao configurada" };
-  const from = Deno.env.get("RESEND_FROM_EMAIL")?.trim();
-  if (!from || !validEmail(from)) return { sent: false, reason: "RESEND_FROM_EMAIL nao configurado" };
   const subject = test ? "Teste de e-mail do site da campanha" : "Novo cadastro no site da campanha";
   const html = test
     ? "<p>Este e um e-mail de teste do formulario de participacao.</p><p>O recebimento esta configurado para este endereco.</p>"
     : `<p>Um novo e-mail foi cadastrado no site da campanha:</p><p><strong>${escapeHtml(email)}</strong></p>`;
+  const text = test
+    ? "Este e um e-mail de teste do formulario de participacao. O recebimento esta configurado para este endereco."
+    : `Um novo e-mail foi cadastrado no site da campanha: ${email}`;
+
+  const gmailResult = await sendWithGmail(recipient, subject, html, text);
+  if (gmailResult) return gmailResult;
+
+  const apiKey = Deno.env.get("RESEND_API_KEY")?.trim();
+  if (!apiKey) return { sent: false, reason: "Configure o Gmail SMTP ou, opcionalmente, o Resend nos secrets da funcao cms-api." };
+  const from = Deno.env.get("RESEND_FROM_EMAIL")?.trim();
+  if (!from || !validEmail(from)) return { sent: false, reason: "RESEND_FROM_EMAIL nao configurado" };
   try {
     const response = await fetch(RESEND_ENDPOINT, {
       method: "POST",
       headers: { authorization: `Bearer ${apiKey}`, "content-type": "application/json" },
-      body: JSON.stringify({ from, to: [recipient], subject, html }),
+      body: JSON.stringify({ from, to: [recipient], subject, html, text }),
     });
     if (!response.ok) return { sent: false, reason: `Resend retornou HTTP ${response.status}` };
     return { sent: true };

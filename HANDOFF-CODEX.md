@@ -1,5 +1,18 @@
 # Handoff para o Codex
 
+## Envio de cadastros pelo Gmail - 24/08/2026
+
+- A Edge Function `supabase/functions/cms-api/index.ts` agora tenta enviar
+  diretamente pelo Gmail usando `GMAIL_SMTP_USER` e
+  `GMAIL_SMTP_APP_PASSWORD` com `smtp.gmail.com` por TLS.
+- O secret precisa ser uma senha de app criada pela conta no Gmail, nunca a
+  senha normal. A funcao usa o Gmail primeiro e mantem Resend como fallback
+  opcional para uma futura troca de provedor.
+- O tutorial do CMS foi atualizado com links para o Gmail, Senhas de app,
+  Secrets do Supabase e teste de recebimento. O envio ainda exige publicar a
+  funcao e cadastrar esses dois secrets; deixar o Gmail aberto no navegador,
+  sozinho, nao autoriza uma Edge Function a enviar mensagens.
+
 ## Ajuste VLibras mobile e arraste - 24/08/2026
 
 - O painel oficial continua com o avatar feminino Hozana e abre encostado ao

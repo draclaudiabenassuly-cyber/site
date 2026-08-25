@@ -807,6 +807,9 @@ div[vw].vlibras-widget [vw-access-button], div[vw-access-button].active { left: 
 .cms-email-help li + li { margin-top: 8px; }
 .cms-email-help code { padding: 2px 4px; border-radius: 2px; background: #e8eef4; color: var(--navy); font-size: 12px; }
 .cms-email-help p { margin: 16px 0 0; color: var(--muted); font-size: 12px; line-height: 1.6; }
+.cms-email-resend-details { margin-top: 18px; border-top: 1px solid #d8e1ea; padding-top: 14px; color: var(--muted); font-size: 13px; }
+.cms-email-resend-details summary { cursor: pointer; color: var(--navy); font-weight: 700; }
+.cms-email-resend-details ol { margin-top: 12px; }
 .cms-record-list { display: grid; gap: 12px; }
 .cms-record { display: grid; grid-template-columns: 68px 1fr auto; align-items: center; gap: 20px; padding: 18px; border: 1px solid #d4deea; background: white; }
 .cms-record-date, .public-agenda-date { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 64px; height: 64px; color: var(--navy); }
