@@ -137,7 +137,7 @@ async function mutateGallery(request: Request, body: CmsRecord, defaultAction: s
   try {
     const current = await readCmsPayload(request);
     const collection = body.resource === "gallery-album" ? "album" : "photo";
-    const list = collection === "album" ? [...current.albums] : [...current.photos];
+    const list: Array<GalleryAlbum | GalleryPhoto> = collection === "album" ? [...current.albums] : [...current.photos];
     const item = { ...(body.item ?? {}) } as GalleryAlbum | GalleryPhoto;
     const editing = defaultAction === "update";
     const id = String(body.id ?? item.id ?? crypto.randomUUID());
