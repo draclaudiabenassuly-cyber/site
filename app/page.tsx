@@ -406,7 +406,6 @@ export default function Home() {
   const [newsletterSent, setNewsletterSent] = useState(false);
   const [newsletterMessage, setNewsletterMessage] = useState("");
   const [newsletterSubmitting, setNewsletterSubmitting] = useState(false);
-  const [editorMode, setEditorMode] = useState(false);
   const [expandedFaq, setExpandedFaq] = useState<number | null>(0);
   const [siteContent, setSiteContent] = useState<SiteContent>(defaultContent);
   const [agendaItems, setAgendaItems] = useState<AgendaItem[]>(agenda);
@@ -668,7 +667,7 @@ export default function Home() {
             </article>
           ))}
         </div>
-        <div className="editorial-hint"><span className="live-dot" /> {siteContent.agendaHint} <button onClick={() => setEditorMode(true)}>Abrir modo gestão</button></div>
+        <div className="editorial-hint"><span className="live-dot" /> {siteContent.agendaHint}</div>
       </section>
 
       <section id="coligacao" className="coalition-section section-pad">
@@ -754,7 +753,6 @@ export default function Home() {
 
       {activePost && <div className="modal-backdrop" role="dialog" aria-modal="true" onClick={() => setActivePost(null)}><article className="post-modal" onClick={(event) => event.stopPropagation()}><button className="modal-close" onClick={() => setActivePost(null)} aria-label="Fechar notícia">×</button><img src={publicMediaSrc(activePost.image, cmsRevision)} alt="" /><div><span>{activePost.category}</span><h2>{activePost.title}</h2><p>{activePost.excerpt}</p><p>Este espaço editorial será atualizado com artigos, vídeos e relatos da caminhada de Cláudia Benassuly pelo Pará.</p><a href={whatsappLink} target="_blank" rel="noreferrer" className="primary-button">Conversar sobre este tema <ArrowUpRight /></a></div></article></div>}
       {activePhoto && <div className="modal-backdrop photo-modal-backdrop" role="dialog" aria-modal="true" onClick={() => setActivePhoto(null)}><button className="modal-close" onClick={() => setActivePhoto(null)} aria-label="Fechar galeria">×</button><img className="photo-modal" src={publicMediaSrc(activePhoto, cmsRevision)} alt="Registro da campanha Cláudia Benassuly" /></div>}
-      {editorMode && <div className="modal-backdrop" role="dialog" aria-modal="true" onClick={() => setEditorMode(false)}><div className="editor-modal" onClick={(event) => event.stopPropagation()}><button className="modal-close" onClick={() => setEditorMode(false)} aria-label="Fechar modo gestão">×</button><p className="eyebrow"><span /> Área editorial</p><h2>Modo gestão da campanha</h2><p>Agenda, notícias e galeria foram estruturadas para receber atualizações da equipe. Nesta primeira versão, os conteúdos exibidos já estão organizados por data, categoria e publicação.</p><div className="editor-status"><span className="live-dot" /> Conteúdo público sincronizado</div><div className="editor-fields"><label>Próximo compromisso<input defaultValue="Escuta com mulheres empreendedoras" /></label><label>Local<input defaultValue="Ananindeua · Pará" /></label><label>Chamada da próxima notícia<input defaultValue="Creche em tempo integral também é liberdade para trabalhar" /></label></div><button className="primary-button" onClick={() => setEditorMode(false)}>Salvar estrutura editorial <ArrowUpRight /></button><small>Para publicar alterações definitivas, conecte a equipe ao painel de conteúdo do projeto.</small></div></div>}
     </main>
   );
 }
