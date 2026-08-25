@@ -9,6 +9,7 @@ const MAX_CONTENT = 1_800_000;
 const MAX_IMAGE_DATA = 900_000;
 const DEFAULT_SIGNUP_RECIPIENT = "draclaudiabenassuly@gmail.com";
 const RESEND_ENDPOINT = "https://api.resend.com/emails";
+const RESEND_CONTACTS_ENDPOINT = "https://api.resend.com/contacts";
 const cors = { "access-control-allow-origin": "*", "access-control-allow-headers": "authorization, x-cms-session, content-type", "access-control-allow-methods": "GET,POST,PUT,DELETE,OPTIONS", "cache-control": "no-store, no-cache, must-revalidate, max-age=0", pragma: "no-cache", expires: "0" };
 
 function json(data: unknown, status = 200) { return new Response(JSON.stringify(data), { status, headers: { ...cors, "content-type": "application/json; charset=utf-8" } }); }
@@ -110,6 +111,23 @@ async function sendSignupEmail(recipient: string, email: string, test = false) {
   }
 }
 
+async function syncResendContact(email: string) {
+  const apiKey = Deno.env.get("RESEND_API_KEY")?.trim();
+  if (!apiKey) return { synced: false, reason: "RESEND_API_KEY nao configurado" };
+  try {
+    const response = await fetch(RESEND_CONTACTS_ENDPOINT, {
+      method: "POST",
+      headers: { authorization: `Bearer ${apiKey}`, "content-type": "application/json" },
+      body: JSON.stringify({ email, unsubscribed: false }),
+    });
+    if (response.ok || response.status === 409) return { synced: true };
+    console.error("Resend contact sync error", response.status, await response.text());
+    return { synced: false, reason: `Resend retornou HTTP ${response.status}` };
+  } catch {
+    return { synced: false, reason: "Nao foi possivel sincronizar o contato no Resend" };
+  }
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: cors });
   try {
@@ -138,7 +156,8 @@ Deno.serve(async (req) => {
       if (error) throw error;
       const recipient = await signupRecipient();
       const notification = await sendSignupEmail(recipient, email);
-      return json({ ok: true, emailSent: notification.sent, emailRecipient: recipient });
+      const newsletter = await syncResendContact(email);
+      return json({ ok: true, emailSent: notification.sent, emailRecipient: recipient, newsletterSynced: newsletter.synced });
     }
     if (action === "email_test") {
       const activeSession = await session(req);

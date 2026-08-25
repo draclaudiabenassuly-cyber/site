@@ -1,17 +1,21 @@
 # Handoff para o Codex
 
-## Envio de cadastros pelo Gmail - 24/08/2026
+## Envio e newsletter pelo Resend - 24/08/2026
 
-- A Edge Function `supabase/functions/cms-api/index.ts` agora tenta enviar
-  diretamente pelo Gmail usando `GMAIL_SMTP_USER` e
-  `GMAIL_SMTP_APP_PASSWORD` com `smtp.gmail.com` por TLS.
-- O secret precisa ser uma senha de app criada pela conta no Gmail, nunca a
-  senha normal. A funcao usa o Gmail primeiro e mantem Resend como fallback
-  opcional para uma futura troca de provedor.
-- O tutorial do CMS foi atualizado com links para o Gmail, Senhas de app,
-  Secrets do Supabase e teste de recebimento. O envio ainda exige publicar a
-  funcao e cadastrar esses dois secrets; deixar o Gmail aberto no navegador,
-  sozinho, nao autoriza uma Edge Function a enviar mensagens.
+- A Edge Function `supabase/functions/cms-api/index.ts` envia as notificacoes
+  usando `RESEND_API_KEY` e `RESEND_FROM_EMAIL`. O remetente precisa pertencer
+  a um dominio verificado no Resend; o destinatario inicial e
+  `draclaudiabenassuly@gmail.com`.
+- Depois de salvar um cadastro em `campaign_signups`, a funcao tenta criar o
+  contato no endpoint oficial do Resend. Assim, novos inscritos aparecem em
+  `Audience > Contacts` e podem receber campanhas em `Broadcasts`.
+- Cadastros anteriores a configuracao do Resend nao sao importados
+  automaticamente. Eles precisam ser importados separadamente antes de uma
+  newsletter para a lista antiga.
+- O envio direto pelo Gmail continua como alternativa usando
+  `GMAIL_SMTP_USER` e `GMAIL_SMTP_APP_PASSWORD`, mas requer senha de app. A
+  conta atual da campanha nao disponibilizou essa opcao; por isso, o Resend e
+  o caminho recomendado.
 
 ## Ajuste VLibras mobile e arraste - 24/08/2026
 
@@ -88,12 +92,27 @@ Na Vercel, confirme as variáveis do mesmo projeto Supabase:
 - `CMS_ADMIN_EMAIL`
 - `CMS_ADMIN_PASSWORD`
 
-Para notificações do formulário, configure nos secrets da Edge Function `cms-api`:
+Para notificações do formulário e sincronização da newsletter, configure nos secrets da Edge Function `cms-api`:
 
 - `RESEND_API_KEY`
 - `RESEND_FROM_EMAIL` com um remetente verificado no Resend
 
-Os cadastros são salvos mesmo antes desses dois secrets existirem. Sem eles, a aba “E-mails” do CMS informa que o aviso automático ainda não foi configurado.
+Os cadastros são salvos mesmo antes desses dois secrets existirem. Sem eles, a aba “E-mails” do CMS informa que o aviso automático ainda não foi configurado e os novos contatos ficam apenas no Supabase.
+
+## Como a equipe gerencia a newsletter
+
+- O visitante informa o e-mail no formulário público. O site salva o endereço em
+  `campaign_signups` sem duplicar o mesmo e-mail.
+- O Gmail recebe uma notificação individual de cada novo cadastro quando o
+  Resend está configurado.
+- Com `RESEND_API_KEY` ativo, o novo e-mail também entra em `Audience >
+  Contacts` no Resend. A equipe pode consultar, segmentar, remover ou marcar
+  um contato como não inscrito.
+- As campanhas são criadas em `Broadcasts`, usando um remetente do domínio
+  verificado. O Gmail da campanha pode ser colocado como endereço de resposta.
+- O painel do CMS não dispara newsletter em massa. O CMS recebe o cadastro e
+  o Resend gerencia os contatos e os disparos, incluindo o cancelamento de
+  inscrição das campanhas.
 
 O login de demonstração permanece `admin@admin.com` / `admin12$`; troque antes
 da publicação definitiva.
@@ -139,9 +158,9 @@ O retorno deve conter as cinco imagens da galeria, o `proposalsJson` com os quat
   autenticado e exibiu 91 campos, 5 fotos e 3 compromissos.
 - O login demonstrativo `admin@admin.com` / `admin12$` ainda deve ser trocado
   pela equipe antes de divulgar o acesso administrativo.
-- O cadastro de e-mails é salvo sem Resend. Para receber avisos automáticos,
-  ainda é necessário configurar `RESEND_API_KEY` e `RESEND_FROM_EMAIL` nos
-  secrets da função `cms-api`.
+- O cadastro de e-mails é salvo sem Resend. Para receber avisos automáticos e
+  sincronizar novos inscritos com a newsletter, é necessário configurar
+  `RESEND_API_KEY` e `RESEND_FROM_EMAIL` nos secrets da função `cms-api`.
 
 ## Correções de interface em 25/08/2026
 

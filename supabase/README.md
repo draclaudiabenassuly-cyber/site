@@ -1,13 +1,21 @@
 # CMS da campanha no Supabase
 
-## Envio direto pelo Gmail
+## Envio e newsletter via Resend
 
-A funcao `cms-api` aceita os secrets `GMAIL_SMTP_USER` e
-`GMAIL_SMTP_APP_PASSWORD`. A senha deve ser uma senha de app criada em
-`https://myaccount.google.com/apppasswords`, nunca a senha normal do Gmail.
-Quando esses dois secrets existem, o envio usa `smtp.gmail.com` por TLS. O
-Resend permanece como fallback opcional com `RESEND_API_KEY` e
-`RESEND_FROM_EMAIL`.
+A função `cms-api` aceita os secrets `RESEND_API_KEY` e
+`RESEND_FROM_EMAIL`. O remetente precisa pertencer a um domínio verificado no
+Resend; o destinatário pode ser `draclaudiabenassuly@gmail.com`.
+
+Quando `RESEND_API_KEY` existe, cada novo cadastro salvo em
+`campaign_signups` também é incluído em Resend Contacts. Assim, a equipe pode
+gerenciar os inscritos em `Audience > Contacts` e enviar campanhas em
+`Broadcasts`. Cadastros feitos antes da configuração da chave não são
+sincronizados automaticamente e precisam ser importados separadamente.
+
+O envio direto pelo Gmail continua implementado como alternativa com os
+secrets `GMAIL_SMTP_USER` e `GMAIL_SMTP_APP_PASSWORD`, mas a senha precisa ser
+uma senha de app, nunca a senha normal do Gmail. A conta atual da campanha não
+disponibilizou essa opção, por isso o Resend é o caminho recomendado.
 
 Este diretório contém a migração, os dados iniciais e a Edge Function usados
 pela aplicação Next.js hospedada na Vercel.
@@ -48,8 +56,9 @@ como `featured_on_home`.
 
 O formulário de participação usa `campaign_signups`, com acesso de leitura
 bloqueado para o navegador. O destinatário editorial inicial é
-`draclaudiabenassuly@gmail.com`; SMTP/Resend deve ser configurado separadamente
-caso a equipe queira receber notificações automáticas.
+`draclaudiabenassuly@gmail.com`. O cadastro gera uma notificação individual no
+Gmail e, com o Resend configurado, também entra na lista de contatos para
+futuras newsletters.
 
 ## Verificação de publicação
 

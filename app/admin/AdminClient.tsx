@@ -197,23 +197,23 @@ function EmailSettings({ content, saving, onChange, onSave, onTest }: { content:
         <EditableField field={{ key: "signupRecipientEmail", label: "E-mail que recebe os cadastros", hint: "Use a conta Gmail da campanha e salve este campo." }} content={content} saving={saving} onChange={onChange} onSave={onSave} />
       </div>
       <div className="cms-email-help">
-        <h3>Mini tutorial para deixar o Gmail recebendo</h3>
-        <p className="cms-inline-help">Modo recomendado: Gmail direto. Quando os secrets do Gmail estiverem configurados, a função usa o Gmail como remetente e o Resend deixa de ser necessário.</p>
+        <h3>Cadastros e newsletter</h3>
+        <p className="cms-inline-help">O Gmail será a caixa de recebimento da campanha. O Resend fará o envio seguro das notificações e organizará os contatos para futuras newsletters.</p>
         <ol>
-          <li>Confira se o destinatário acima está como <strong>draclaudiabenassuly@gmail.com</strong>, salve o campo e abra o <a href="https://mail.google.com/" target="_blank" rel="noreferrer">Gmail</a>.</li>
-          <li>No Gmail, ative a verificação em duas etapas e abra <a href="https://myaccount.google.com/apppasswords" target="_blank" rel="noreferrer">Senhas de app</a>. Crie uma senha chamada <strong>Site da campanha</strong> e copie o código de 16 caracteres. Essa não é a senha normal da conta.</li>
-          <li>No <a href="https://supabase.com/dashboard/project/ubzgxmxroeygdukjsinh/settings/functions" target="_blank" rel="noreferrer">Supabase &gt; Edge Functions &gt; Secrets</a>, na função <strong>cms-api</strong>, adicione <code>GMAIL_SMTP_USER</code> com o e-mail do Gmail e <code>GMAIL_SMTP_APP_PASSWORD</code> com a senha de app. Esses secrets ficam somente no servidor.</li>
-          <li>Publique novamente a função <strong>cms-api</strong> e volte aqui para clicar em <strong>Enviar e-mail de teste</strong>. Confira a Caixa de entrada e o Spam do Gmail.</li>
+          <li>Confira se o destinatário acima está como <strong>draclaudiabenassuly@gmail.com</strong> e salve este campo. Cada novo cadastro continuará sendo guardado no banco do site.</li>
+          <li>No <a href="https://resend.com/domains" target="_blank" rel="noreferrer">Resend &gt; Domains</a>, verifique o domínio da campanha. O remetente deve usar esse domínio, por exemplo <code>contato@claudiabenassuly.com.br</code>; o Gmail não pode ser usado como remetente técnico do Resend.</li>
+          <li>Na conta do Resend, abra <a href="https://resend.com/api-keys" target="_blank" rel="noreferrer">API Keys</a>, crie uma chave para o site e salve-a somente nos secrets do servidor.</li>
+          <li>No <a href="https://supabase.com/dashboard/project/ubzgxmxroeygdukjsinh/settings/functions" target="_blank" rel="noreferrer">Supabase &gt; Edge Functions &gt; Secrets</a>, na função <strong>cms-api</strong>, adicione <code>RESEND_API_KEY</code> e <code>RESEND_FROM_EMAIL</code>. Esses secrets nunca ficam no navegador.</li>
+          <li>Publique novamente a função <strong>cms-api</strong>, volte aqui e clique em <strong>Enviar e-mail de teste</strong>. Confira a Caixa de entrada e o Spam do Gmail.</li>
         </ol>
         <details className="cms-email-resend-details">
-          <summary>Alternativa opcional: usar Resend no futuro</summary>
+          <summary>Como gerenciar os inscritos e enviar newsletters</summary>
           <ol className="cms-email-resend-help">
-          <li>Confira se o destinatário acima está como <strong>draclaudiabenassuly@gmail.com</strong> e salve o campo. Depois, <a href="https://mail.google.com/" target="_blank" rel="noreferrer">abra o Gmail</a> para conferir a caixa de recebimento.</li>
-          <li>O Gmail será a caixa de recebimento. O disparo é feito com segurança pelo servidor, sem colocar senha do Gmail no site.</li>
-          <li>Se ainda não tiver conta, <a href="https://resend.com/signup" target="_blank" rel="noreferrer">crie a conta no Resend</a>. Depois abra <a href="https://resend.com/api-keys" target="_blank" rel="noreferrer">API Keys</a> para gerar a chave e <a href="https://resend.com/domains" target="_blank" rel="noreferrer">Domains</a> para verificar o endereço ou domínio remetente.</li>
-          <li>No projeto da Cláudia, abra <a href="https://supabase.com/dashboard/project/ubzgxmxroeygdukjsinh/functions" target="_blank" rel="noreferrer"><strong>Edge Functions</strong></a> no Supabase, entre em <strong>cms-api</strong> e use <a href="https://supabase.com/dashboard/project/ubzgxmxroeygdukjsinh/settings/functions" target="_blank" rel="noreferrer"><strong>Secrets</strong></a> para adicionar <code>RESEND_API_KEY</code> e <code>RESEND_FROM_EMAIL</code>. Use como remetente um endereço verificado no Resend.</li>
-          <li>Na tela da função <strong>cms-api</strong>, publique novamente a função. Depois volte aqui e clique em <strong>Enviar e-mail de teste</strong>.</li>
-          <li>No Gmail, confira a Caixa de entrada e o Spam. Se quiser, <a href="https://mail.google.com/mail/u/0/#settings/filters" target="_blank" rel="noreferrer">crie um filtro</a> para mensagens com o assunto “Novo cadastro no site da campanha”.</li>
+          <li>Abra <a href="https://resend.com/audience" target="_blank" rel="noreferrer">Audience</a> no Resend. Cada novo cadastro feito depois da configuração da API será incluído automaticamente em <strong>Contacts</strong>.</li>
+          <li>Em <strong>Contacts</strong>, você poderá consultar, segmentar, remover ou marcar um contato como não inscrito. Não envie mensagens para quem pediu para sair.</li>
+          <li>Para criar uma campanha, abra <strong>Broadcasts</strong>, escreva o e-mail, escolha os contatos e use um remetente do domínio verificado. Coloque <strong>draclaudiabenassuly@gmail.com</strong> como endereço de resposta quando quiser receber as respostas no Gmail.</li>
+          <li>O Gmail recebe os avisos individuais de novos cadastros. O envio da newsletter é feito no Resend, que também oferece o controle de cancelamento de inscrição.</li>
+          <li>Cadastros feitos antes da ativação do Resend continuam preservados no Supabase, mas precisam ser importados para o Resend antes de uma campanha para essa lista antiga.</li>
           </ol>
         </details>
         <p><strong>Importante:</strong> nunca coloque a API key, a senha do Gmail ou a chave de serviço do Supabase em campos públicos, em variáveis <code>NEXT_PUBLIC_*</code> ou no código do navegador.</p>
