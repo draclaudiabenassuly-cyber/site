@@ -280,9 +280,8 @@ function pinOpenedPanel() {
   const root = host.shadowRoot;
   if (!root) return;
   const playerFrame = root.querySelector<HTMLIFrameElement>("iframe[title='vlibras-player']");
-  if (playerFrame && playerFrame.dataset.claudiaProxySrc !== "true") {
-    playerFrame.dataset.claudiaProxySrc = "true";
-    playerFrame.src = LOCAL_PLAYER_SRC;
+  if (playerFrame && playerFrame.getAttribute("src") !== LOCAL_PLAYER_SRC) {
+    playerFrame.setAttribute("src", LOCAL_PLAYER_SRC);
   }
   addShadowStyle(root, "claudia-vlibras-panel-style", `
     :host {
