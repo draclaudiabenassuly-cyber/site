@@ -25,6 +25,7 @@ const SCRIPT_SRC = "https://vlibras.gov.br/app/vlibras-plugin.js";
 const SCRIPT_ID = "claudia-vlibras-script";
 let draggedPanelPosition: { left: number; top: number } | null = null;
 let preparedPanelHost: HTMLElement | null = null;
+let accessButtonInteracted = false;
 
 function setImportant(element: HTMLElement, property: string, value: string) {
   element.style.setProperty(property, value, "important");
@@ -230,6 +231,23 @@ function pinAccessButton() {
       pointer-events: none !important;
     }
   `);
+
+  const button = root.getElementById("vlibras-button") as HTMLButtonElement | null;
+  if (button && button.dataset.claudiaOpenBound !== "true") {
+    button.dataset.claudiaOpenBound = "true";
+    button.addEventListener("click", () => {
+      const panel = document.getElementById("vlibras-app-root");
+      const wasOpen = accessButtonInteracted && panel?.getAttribute("data-active") === "true";
+      accessButtonInteracted = true;
+      window.setTimeout(() => {
+        const currentPanel = document.getElementById("vlibras-app-root");
+        if (currentPanel) {
+          currentPanel.setAttribute("data-active", wasOpen ? "false" : "true");
+        }
+        pinOpenedPanel();
+      }, 0);
+    });
+  }
 }
 
 function pinOpenedPanel() {
@@ -241,11 +259,11 @@ function pinOpenedPanel() {
   // is clicked, then follow the official data-active state for open/close.
   if (preparedPanelHost !== host) {
     preparedPanelHost = host;
-    if (host.getAttribute("data-active") === "true") {
-      host.setAttribute("data-active", "false");
-    }
   }
-  const isActive = host.getAttribute("data-active") === "true";
+  if (!accessButtonInteracted && host.getAttribute("data-active") === "true") {
+    host.setAttribute("data-active", "false");
+  }
+  const isActive = accessButtonInteracted && host.getAttribute("data-active") === "true";
   const layout = getPanelLayout();
 
   const panelStyle = {
@@ -444,6 +462,8 @@ export default function VlibrasWidget() {
       window.clearTimeout(stopRetryTimer);
       window.removeEventListener("resize", onViewportChange);
       script?.removeEventListener("load", onScriptLoad);
+      preparedPanelHost = null;
+      accessButtonInteracted = false;
     };
   }, []);
 
