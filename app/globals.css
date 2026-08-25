@@ -94,6 +94,38 @@ html body [class*="vpw-wrapper"] {
   z-index: 2147483639 !important;
 }
 
+/* Shared mobile navigation and public-page hydration guard. */
+.public-mobile-menu { display: none; align-items: center; justify-content: center; gap: 4px; min-width: 58px; padding: 9px 10px; border: 1px solid #c7d3df; border-radius: 999px; background: transparent; color: var(--navy); cursor: pointer; }
+.public-mobile-menu span { display: block; width: 13px; height: 1px; background: currentColor; }
+.public-mobile-menu b { margin-left: 2px; font-size: 9px; letter-spacing: .08em; text-transform: uppercase; }
+.public-mobile-contact { display: none; }
+.public-editorial-page.is-hydrating > *, .legal-page.is-hydrating > *, .santinho-page.is-hydrating > *, .campaign-shell.is-hydrating > * { visibility: hidden; }
+
+@media (max-width: 680px) {
+  .public-editorial-header { align-items: center; flex-wrap: wrap; gap: 12px; }
+  .public-mobile-menu { display: flex; margin-left: auto; }
+  .public-editorial-header nav, .public-editorial-header nav.is-open { order: 3; display: none; width: 100%; margin-top: 2px; padding: 4px 0 0; flex-direction: column; align-items: stretch; gap: 0; }
+  .public-editorial-header nav.is-open { display: flex; }
+  .public-editorial-header nav a { display: block; padding: 13px 0; border-top: 1px solid var(--line); font-size: 10px; }
+  .public-editorial-header .public-editorial-back { display: none; }
+  .public-mobile-contact { display: block!important; color: var(--teal-deep)!important; }
+  .public-gallery-toolbar { margin-bottom: 20px; padding-right: 16px; padding-left: 16px; }
+  .public-gallery-page-grid { grid-template-columns: 1fr; gap: 12px; margin-bottom: 70px; padding-right: 16px; padding-left: 16px; }
+  .public-gallery-page-grid button { aspect-ratio: 4 / 3; min-height: 0; }
+  .public-gallery-page-grid button img { min-height: 0; }
+  .gallery-lightbox { width: calc(100vw - 24px); }
+  .gallery-lightbox img { max-height: 62vh; }
+  .gallery-lightbox figcaption { padding: 14px 16px; }
+  .santinho-page .public-editorial-header { margin-right: -16px; margin-left: -16px; }
+}
+
+/* The downloadable santinho is always one full A4 landscape sheet. */
+@media print {
+  @page { size: A4 landscape; margin: 0; }
+  html body.printing-santinho, html body.printing-santinho .santinho-page { width: 297mm!important; min-width: 297mm!important; height: 210mm!important; min-height: 210mm!important; padding: 0!important; margin: 0!important; overflow: hidden!important; }
+  body.printing-santinho .santinho-page .printable-santinho { width: 297mm!important; max-width: 297mm!important; height: 210mm!important; min-height: 210mm!important; margin: 0!important; }
+}
+
 html body > #vlibras-access-wrapper {
   left: 0 !important;
   bottom: 0 !important;

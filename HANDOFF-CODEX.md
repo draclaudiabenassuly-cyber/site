@@ -247,3 +247,39 @@ O retorno deve conter as cinco imagens da galeria, o `proposalsJson` com os quat
   Ele abria para qualquer visitante, não salvava dados e não era o CMS real.
   A Home agora exibe somente o aviso público da agenda; a edição continua
   exclusivamente no `/admin` autenticado.
+
+## Auditoria mobile, contatos e hidratação do CMS - retomada 24/08/2026
+
+- A auditoria encontrou que somente a Home tinha menu de aplicativo, WhatsApp
+  flutuante e Cláudia Digital. O menu compartilhado agora está em todas as
+  rotas editoriais, Santinho e páginas legais; a logo desses menus continua
+  levando para `/`.
+- A página `/galeria` recebeu regras mobile para uma coluna, proporção estável
+  dos cards, filtros com rolagem horizontal e lightbox dimensionado para a
+  tela. Os cards também ganharam rótulo acessível e continuam abrindo no
+  primeiro clique.
+- WhatsApp foi centralizado em `lib/campaign-contact.ts`. Home, rodapés,
+  compromissos, menu, Santinho e balões usam as mesmas mensagens e o número
+  configurado no CMS. O número real não foi encontrado no projeto, no segundo
+  cérebro nem no conteúdo público atual; continua pendente informar DDI + DDD
+  para que o destino deixe de usar o fallback sem número.
+- O novo menu `/admin` > `Contato e bot` permite editar número, texto do
+  botão flutuante e as três mensagens de WhatsApp. A mesma seção possui CRUD
+  de perguntas e respostas da Cláudia Digital, com palavras-chave, resposta,
+  ativar/desativar, cadastrar, editar, excluir e publicar.
+- A Home e as páginas internas leem `assistantFaqJson`, mantendo as respostas
+  básicas embutidas como fallback. A estrutura foi adicionada a
+  `lib/cms-defaults.ts` para o Supabase aceitar o campo sem migração separada.
+- Foi removido o desenho inicial de dados padrão durante a primeira resposta
+  do CMS: Home, páginas editoriais, legais e Santinho usam `aria-busy` e uma
+  classe de hidratação até a primeira leitura terminar. As leituras continuam
+  `no-store`; as revisões de mídia do Santinho e páginas legais agora são
+  determinísticas, sem `Date.now()` como chave de imagem.
+- O Santinho continua configurado para impressão como uma única folha A4
+  horizontal (`297mm x 210mm`), preenchendo a página no Salvar para imprimir /
+  Salvar como PDF. A visualização de leitura no celular não foi empilhada por
+  causa desta solicitação: a exigência é a impressão horizontal.
+- Verificações locais: `git diff --check`, `npm.cmd run build`, 17 rotas geradas;
+  auditoria Chrome local confirmou menu compartilhado, um WhatsApp e um
+  balão em cada rota pública, cinco cards da galeria, abertura do lightbox,
+  filtros e abertura do balão de automação.

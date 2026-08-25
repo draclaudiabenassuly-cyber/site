@@ -3,15 +3,17 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { defaultContent, type SiteContent } from "../../lib/cms-defaults";
-import { publicMediaSrc } from "../../lib/public-media";
-
-const whatsappLink =
-  "https://wa.me/?text=Ol%C3%A1%20Cl%C3%A1udia%20Benassuly%2C%20quero%20conhecer%20a%20campanha.";
+import { mediaRevisionFor, publicMediaSrc } from "../../lib/public-media";
+import { campaignWhatsAppLink, whatsappMessages } from "../../lib/campaign-contact";
+import { PublicHeader } from "../components/public-cms";
+import CampaignContactTools from "../components/CampaignContactTools";
 
 export default function SantinhoPage() {
   const [copied, setCopied] = useState(false);
   const [siteContent, setSiteContent] = useState<SiteContent>(defaultContent);
-  const [cmsRevision, setCmsRevision] = useState(0);
+  const [cmsRevision, setCmsRevision] = useState(() => mediaRevisionFor([defaultContent.siteHeaderLogo, defaultContent.siteFooterLogo, defaultContent.santinhoLogo, defaultContent.santinhoImage]));
+  const [loading, setLoading] = useState(true);
+  const whatsappLink = campaignWhatsAppLink(siteContent.whatsappMessageCampaign || whatsappMessages.campaign, siteContent.whatsappNumber);
 
   useEffect(() => {
     let disposed = false;
@@ -21,9 +23,11 @@ export default function SantinhoPage() {
         if (!response.ok || disposed) return;
         const payload = await response.json();
         if (!payload?.content || disposed) return;
-        setSiteContent({ ...defaultContent, ...payload.content });
-        setCmsRevision(Date.now());
+        const nextContent = { ...defaultContent, ...payload.content };
+        setSiteContent(nextContent);
+        setCmsRevision(mediaRevisionFor([nextContent.siteHeaderLogo, nextContent.siteFooterLogo, nextContent.santinhoLogo, nextContent.santinhoImage]));
       } catch { /* keep the bundled santinho while the CMS is unavailable */ }
+      finally { if (!disposed) setLoading(false); }
     };
     void load();
     window.addEventListener("focus", load);
@@ -69,7 +73,7 @@ export default function SantinhoPage() {
   }
 
   return (
-    <main className="card-page">
+    <main className={`card-page santinho-page${loading ? " is-hydrating" : ""}`} aria-busy={loading}>
       <style>{`
         @media print {
           @page { size: A4 landscape; margin: 0; }
@@ -246,10 +250,7 @@ export default function SantinhoPage() {
           body.printing-santinho .vpw-wrapper { display: none !important; visibility: hidden !important; }
         }
       `}</style>
-      <header className="card-page-header">
-        <Link href="/" className="card-page-brand" aria-label="Voltar para a campanha Cláudia Benassuly"><img src={publicMediaSrc(siteContent.siteHeaderLogo, cmsRevision)} alt="Cláudia Benassuly" /></Link>
-        <Link href="/" className="card-page-back">Voltar para o site</Link>
-      </header>
+      <PublicHeader content={siteContent} mediaRevision={cmsRevision} />
       <section className="card-page-intro">
         <p className="eyebrow"><span /> Compartilhe este link</p>
         <h1>O santinho da campanha, <em>agora digital.</em></h1>
@@ -289,6 +290,7 @@ export default function SantinhoPage() {
       </div>
       <div className="card-page-footer"><Link href="/">Cláudia Benassuly</Link><span>Partido {siteContent.partyName} · candidata {siteContent.candidateNumber}</span><a href={whatsappLink} target="_blank" rel="noreferrer">WhatsApp da campanha</a><Link href="/politica-de-privacidade">Privacidade</Link><Link href="/cookies">Cookies</Link><Link href="/termos-de-uso">Termos de uso</Link><a href="https://douglasbragaoficial.com.br" target="_blank" rel="noreferrer">Desenvolvido por Douglas Braga</a></div>
       <div className="card-page-legal"><strong>Informações legais</strong><span>Eleição Claudia de Fatima e Silva — Deputado Federal · CNPJ 68.553.373/0001-23</span><span>Av. Nazaré, 272, Ed. Clube de Engenharia, Sala 104 · Nazaré · Belém/PA · CEP 66.035-115</span><span>E-mail oficial: psdbpaestadual@gmail.com · Contato: draclaudiabenassuly@gmail.com</span><small>© 2026 Cláudia Benassuly. Todos os direitos reservados.</small></div>
+      <CampaignContactTools content={siteContent} />
     </main>
   );
 }

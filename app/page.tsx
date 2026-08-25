@@ -3,6 +3,7 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { defaultContent, type GalleryPhoto, type SiteContent } from "../lib/cms-defaults";
 import { mediaRevisionFor as stableMediaRevision, publicMediaSrc } from "../lib/public-media";
+import { campaignWhatsAppLink, whatsappMessages } from "../lib/campaign-contact";
 
 type AgendaItem = {
   id?: string;
@@ -23,9 +24,6 @@ type Post = {
   readTime: string;
   image: string;
 };
-
-const whatsappLink =
-  "https://wa.me/?text=Ol%C3%A1%20Cl%C3%A1udia%20Benassuly%2C%20quero%20conhecer%20a%20campanha.";
 
 const socialLinks = [
   {
@@ -412,6 +410,8 @@ export default function Home() {
   const [newsItems, setNewsItems] = useState<Post[]>(posts);
   const [cmsGalleryPhotos, setCmsGalleryPhotos] = useState<GalleryPhoto[]>([]);
   const [cmsRevision, setCmsRevision] = useState(() => mediaRevisionFor(defaultContent));
+  const [contentReady, setContentReady] = useState(false);
+  const whatsappLink = campaignWhatsAppLink(siteContent.whatsappMessageCampaign || whatsappMessages.campaign, siteContent.whatsappNumber);
 
   useEffect(() => {
     let disposed = false;
@@ -429,6 +429,7 @@ export default function Home() {
         if (Array.isArray(payload.photos)) setCmsGalleryPhotos(nextPhotos);
         setCmsRevision(mediaRevisionFor(nextContent, nextPhotos));
       } catch { /* public pages keep the safe bundled defaults */ }
+      finally { if (!disposed) setContentReady(true); }
     };
     void load();
     window.addEventListener("focus", load);
@@ -480,7 +481,13 @@ export default function Home() {
       keys: ["coligação", "coligacao", "aliados", "governador", "senador", "antônia brito", "antonia brito"],
       answer: `${siteContent.coalitionName}: ${siteContent.coalitionParties}. Os nomes e números informados são ${siteContent.coalitionGovernorName} ${siteContent.coalitionGovernorNumber} para Governador, ${siteContent.coalitionSenatorName} ${siteContent.coalitionSenatorNumber} para Senador, ${siteContent.coalitionStateDeputyName} ${siteContent.coalitionStateDeputyNumber} para Deputado Estadual e ${siteContent.coalitionFederalDeputyName} ${siteContent.coalitionFederalDeputyNumber} para Deputada Federal.`,
     };
-    const match = [coalitionAnswer, ...assistantKnowledge].find((item) =>
+    let customAnswers: Array<{ keys: string[]; answer: string }> = [];
+    try {
+      const parsed = JSON.parse(siteContent.assistantFaqJson || "[]") as unknown;
+      if (Array.isArray(parsed)) customAnswers = parsed.filter((item): item is { keys: string[]; answer: string } => Boolean(item && typeof item === "object" && (item as { active?: boolean }).active && Array.isArray((item as { keys?: unknown }).keys) && typeof (item as { answer?: unknown }).answer === "string"));
+    } catch { /* the built-in knowledge remains available if the CMS field is invalid */ }
+    const customMatch = customAnswers.find((item) => item.keys.some((key) => normalized.includes(key.toLocaleLowerCase("pt-BR").normalize("NFD").replace(/\p{Diacritic}/gu, ""))));
+    const match = customMatch ?? [coalitionAnswer, ...assistantKnowledge].find((item) =>
       item.keys.some((key) => {
         const normalizedKey = key
           .toLocaleLowerCase("pt-BR")
@@ -523,7 +530,7 @@ export default function Home() {
   }
 
   return (
-    <main className="campaign-shell">
+    <main className={`campaign-shell${contentReady ? "" : " is-hydrating"}`} aria-busy={!contentReady}>
       <div className="top-ribbon">
         <span className="ribbon-dot" />
         <span className="ribbon-label">{siteContent.topRibbonLabel}</span>
@@ -747,7 +754,7 @@ export default function Home() {
         <div className="legal-footer"><strong>Informações legais</strong><span>Eleição Claudia de Fatima e Silva — Deputado Federal · CNPJ 68.553.373/0001-23</span><span>Av. Nazaré, 272, Ed. Clube de Engenharia, Sala 104 · Nazaré · Belém/PA · CEP 66.035-115</span><span>E-mail oficial: psdbpaestadual@gmail.com · Contato: draclaudiabenassuly@gmail.com</span><small>© 2026 Cláudia Benassuly. Todos os direitos reservados.</small></div>
       </footer>
 
-      <a className="whatsapp-float" href={whatsappLink} target="_blank" rel="noreferrer" aria-label="Falar com a campanha pelo WhatsApp"><ChatIcon /><span>Fale com a campanha</span></a>
+      <a className="whatsapp-float" href={whatsappLink} target="_blank" rel="noreferrer" aria-label={`${siteContent.whatsappButtonLabel || "Fale com a campanha"} pelo WhatsApp`}><ChatIcon /><span>{siteContent.whatsappButtonLabel || "Fale com a campanha"}</span></a>
       <button className="chat-float" onClick={() => setChatOpen((value) => !value)} aria-label="Abrir Cláudia Digital"><span className="chat-pulse" /><ChatIcon /></button>
       {chatOpen && <div className="chat-panel"><div className="chat-head"><div className="bot-avatar"><SparkIcon /></div><div><strong>Cláudia Digital</strong><span>Assistente da campanha · online</span></div><button onClick={() => setChatOpen(false)} aria-label="Fechar assistente">×</button></div><div className="chat-body">{chatMessages.map((message, index) => <div className={`chat-message ${message.from}`} key={`${message.text}-${index}`}>{message.text}</div>)}</div><form className="chat-form" onSubmit={sendChat}><input value={chatInput} onChange={(event) => setChatInput(event.target.value)} placeholder="Pergunte sobre a campanha" aria-label="Pergunte sobre a campanha" /><button type="submit" aria-label="Enviar pergunta"><ArrowUpRight /></button></form><div className="chat-note">Respostas baseadas no material oficial da campanha.</div></div>}
 

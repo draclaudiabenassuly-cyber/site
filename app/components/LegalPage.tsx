@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState, type ReactNode } from "react";
-import Link from "next/link";
 import { defaultContent, type SiteContent } from "../../lib/cms-defaults";
-import { publicMediaSrc } from "../../lib/public-media";
+import { mediaRevisionFor } from "../../lib/public-media";
+import { PublicHeader } from "./public-cms";
+import CampaignContactTools from "./CampaignContactTools";
 
 type LegalPageProps = {
   eyebrow: string;
@@ -20,7 +21,8 @@ const legalLinks = [
 
 export default function LegalPage({ eyebrow, title, intro, children }: LegalPageProps) {
   const [siteContent, setSiteContent] = useState<SiteContent>(defaultContent);
-  const [mediaRevision, setMediaRevision] = useState(0);
+  const [mediaRevision, setMediaRevision] = useState(() => mediaRevisionFor([defaultContent.siteHeaderLogo, defaultContent.siteFooterLogo]));
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let active = true;
@@ -29,10 +31,12 @@ export default function LegalPage({ eyebrow, title, intro, children }: LegalPage
         .then((response) => response.ok ? response.json() : null)
         .then((payload) => {
           if (!active || !payload?.content) return;
-          setSiteContent({ ...defaultContent, ...payload.content });
-          setMediaRevision(Date.now());
+          const nextContent = { ...defaultContent, ...payload.content };
+          setSiteContent(nextContent);
+          setMediaRevision(mediaRevisionFor([nextContent.siteHeaderLogo, nextContent.siteFooterLogo]));
         })
-        .catch(() => undefined);
+        .catch(() => undefined)
+        .finally(() => { if (active) setLoading(false); });
     };
     load();
     window.addEventListener("focus", load);
@@ -45,13 +49,8 @@ export default function LegalPage({ eyebrow, title, intro, children }: LegalPage
   }, []);
 
   return (
-    <main className="legal-page">
-      <header className="legal-page-header">
-        <Link href="/" className="legal-page-brand" aria-label="Voltar para a campanha Cláudia Benassuly">
-          <img src={publicMediaSrc(siteContent.siteHeaderLogo, mediaRevision)} alt="Cláudia Benassuly" />
-        </Link>
-        <Link href="/" className="legal-page-back">Voltar para o site</Link>
-      </header>
+    <main className={`legal-page${loading ? " is-hydrating" : ""}`} aria-busy={loading}>
+      <PublicHeader content={siteContent} mediaRevision={mediaRevision} />
 
       <nav className="legal-page-nav" aria-label="Páginas legais">
         {legalLinks.map((link) => <a className={link.href.endsWith(title === "Política de Privacidade" ? "privacidade" : title === "Política de Cookies" ? "cookies" : "termos-de-uso") ? "active" : ""} href={link.href} key={link.href}>{link.label}</a>)}
@@ -70,6 +69,7 @@ export default function LegalPage({ eyebrow, title, intro, children }: LegalPage
         <span>E-mail oficial: psdbpaestadual@gmail.com · Contato: draclaudiabenassuly@gmail.com</span>
         <span>© 2026 Cláudia Benassuly. Todos os direitos reservados.</span>
       </footer>
+      <CampaignContactTools content={siteContent} />
     </main>
   );
 }

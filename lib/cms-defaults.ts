@@ -50,6 +50,14 @@ export type ProposalCard = {
   icon: string;
 };
 
+export type AssistantFaq = {
+  id: string;
+  question: string;
+  keys: string[];
+  answer: string;
+  active: boolean;
+};
+
 export type SiteContent = {
   heroEyebrow: string;
   heroTitle: string;
@@ -140,6 +148,12 @@ export type SiteContent = {
   footerExploreLabel: string;
   footerConnectLabel: string;
   signupRecipientEmail: string;
+  whatsappNumber: string;
+  whatsappButtonLabel: string;
+  whatsappMessageCampaign: string;
+  whatsappMessageMore: string;
+  whatsappMessageCommitment: string;
+  assistantFaqJson: string;
   galleryAlbumsJson: string;
   galleryPhotosJson: string;
 };
@@ -239,6 +253,12 @@ export const defaultContent: SiteContent = {
   footerExploreLabel: "Explore",
   footerConnectLabel: "Conecte-se",
   signupRecipientEmail: "draclaudiabenassuly@gmail.com",
+  whatsappNumber: "",
+  whatsappButtonLabel: "Fale com a campanha",
+  whatsappMessageCampaign: "Olá Cláudia Benassuly, quero conhecer a campanha.",
+  whatsappMessageMore: "Olá Cláudia Benassuly, quero saber mais sobre a campanha.",
+  whatsappMessageCommitment: "Olá Cláudia Benassuly, quero saber mais sobre este compromisso.",
+  assistantFaqJson: "[]",
   galleryAlbumsJson: JSON.stringify([{ id: "campanha-2026", title: "Campanha 2026", slug: "campanha-2026", description: "Identidade, propostas e registros da caminhada de Cláudia Benassuly.", cover: "/campaign/gallery-principal.jpg", publishedAt: "2026-08-24", featured: true, sortOrder: 0 }]),
   galleryPhotosJson: JSON.stringify([
     { id: "galeria-principal", albumId: "campanha-2026", title: "Registro principal", caption: "Por ela. Por nós. Por todas.", image: "/campaign/gallery-principal.jpg", alt: "Cláudia Benassuly em registro principal da campanha", publishedAt: "2026-08-24", featuredOnHome: true, sortOrder: 0 },
