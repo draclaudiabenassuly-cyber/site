@@ -24,6 +24,7 @@ const WIDGET_SRC = "https://vlibras.gov.br/app";
 const SCRIPT_SRC = "https://vlibras.gov.br/app/vlibras-plugin.js";
 const SCRIPT_ID = "claudia-vlibras-script";
 let draggedPanelPosition: { left: number; top: number } | null = null;
+let preparedPanelHost: HTMLElement | null = null;
 
 function setImportant(element: HTMLElement, property: string, value: string) {
   element.style.setProperty(property, value, "important");
@@ -68,14 +69,14 @@ function isMobileViewport() {
 function getPanelLayout() {
   if (isMobileViewport()) {
     return {
-      left: "12px",
+      left: "68px",
       right: "auto",
       top: "auto",
-      bottom: "68px",
-      width: "min(300px, calc(100vw - 24px))",
-      maxWidth: "calc(100vw - 24px)",
-      maxHeight: "calc(100dvh - 96px)",
-      height: "min(420px, calc(100dvh - 96px))",
+      bottom: "16px",
+      width: "min(300px, calc(100vw - 76px))",
+      maxWidth: "calc(100vw - 76px)",
+      maxHeight: "calc(100dvh - 32px)",
+      height: "min(420px, calc(100dvh - 32px))",
     };
   }
 
@@ -198,6 +199,9 @@ function pinAccessButton() {
   if (!root) return;
   addShadowStyle(root, "claudia-vlibras-access-style", `
     #vlibras-access {
+      display: flex !important;
+      visibility: visible !important;
+      opacity: 1 !important;
       position: fixed !important;
       left: 16px !important;
       right: auto !important;
@@ -231,6 +235,17 @@ function pinAccessButton() {
 function pinOpenedPanel() {
   const host = document.getElementById("vlibras-app-root") as HTMLElement | null;
   if (!host) return;
+
+  // The current VLibras script creates the shadow host already active and
+  // showing its splash screen. Keep it closed until the visible access button
+  // is clicked, then follow the official data-active state for open/close.
+  if (preparedPanelHost !== host) {
+    preparedPanelHost = host;
+    if (host.getAttribute("data-active") === "true") {
+      host.setAttribute("data-active", "false");
+    }
+  }
+  const isActive = host.getAttribute("data-active") === "true";
   const layout = getPanelLayout();
 
   const panelStyle = {
@@ -244,11 +259,13 @@ function pinOpenedPanel() {
     zIndex: "2147483640",
   };
   for (const [property, value] of Object.entries(panelStyle)) setImportant(host, property, value);
+  setImportant(host, "display", isActive ? "block" : "none");
 
   const root = host.shadowRoot;
   if (!root) return;
   addShadowStyle(root, "claudia-vlibras-panel-style", `
     :host {
+      display: ${isActive ? "block" : "none"} !important;
       position: fixed !important;
       left: ${layout.left} !important;
       right: ${layout.right} !important;
@@ -343,7 +360,15 @@ function pinDetachedPanels() {
 export default function VlibrasWidget() {
   useEffect(() => {
     const initializeWidget = () => {
-      if (!window.VLibras || window.__claudiaVlibrasInitialized) return;
+      if (!window.VLibras) {
+        // Newer VLibras builds auto-create #vlibras-app-root and no longer
+        // expose the legacy window.VLibras constructor.
+        if (document.getElementById("vlibras-app-root")) {
+          window.__claudiaVlibrasInitialized = true;
+        }
+        return;
+      }
+      if (window.__claudiaVlibrasInitialized) return;
       configureGlobals();
       try {
         new window.VLibras.Widget(WIDGET_SRC);
@@ -371,7 +396,7 @@ export default function VlibrasWidget() {
       if (window.VLibras || document.getElementById(SCRIPT_ID)) return;
       const externalScript = document.createElement("script");
       externalScript.id = SCRIPT_ID;
-      externalScript.src = `${SCRIPT_SRC}?v=1`;
+      externalScript.src = `${SCRIPT_SRC}?v=2`;
       externalScript.async = true;
       externalScript.addEventListener("load", onScriptLoad, { once: true });
       externalScript.addEventListener("error", () => externalScript.remove(), { once: true });
