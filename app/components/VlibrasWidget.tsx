@@ -187,6 +187,7 @@ function pinOpenedPanel() {
     maxHeight: "calc(100vh - 32px)",
     margin: "0",
     transform: "none",
+    translate: "none",
     animation: "none",
     transition: "none",
     zIndex: "2147483640",
@@ -208,6 +209,7 @@ function pinOpenedPanel() {
       max-height: calc(100vh - 32px) !important;
       margin: 0 !important;
       transform: none !important;
+      translate: none !important;
       animation: none !important;
       transition: none !important;
       z-index: 2147483640 !important;
