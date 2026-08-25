@@ -798,6 +798,11 @@ div[vw].vlibras-widget [vw-access-button], div[vw-access-button].active { left: 
 .cms-modal h2 { margin: 0 0 24px; color: var(--navy); font-size: 37px; letter-spacing: -.06em; }
 .cms-close { position: absolute; top: 10px; right: 14px; border: 0; background: transparent; color: var(--navy); font-size: 30px; font-weight: 200; }
 .cms-form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-bottom: 16px; }
+.cms-proposal-list { display: grid; gap: 18px; }
+.cms-proposal-editor { padding: 20px; border: 1px solid #d7e0e9; background: #fff; }
+.cms-proposal-editor-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 18px; color: var(--navy); }
+.cms-proposal-editor-head button { border: 0; background: transparent; color: #a23838; cursor: pointer; font-size: 12px; font-weight: 800; }
+.cms-proposal-editor select { width: 100%; min-height: 45px; padding: 10px 12px; border: 1px solid #cbd6e3; border-radius: 3px; background: white; color: var(--ink); font-size: 14px; }
 .cms-modal > .primary-button { margin-top: 20px; }
 .public-list-intro { padding-bottom: 55px; }
 .public-agenda-list, .public-news-grid { display: grid; gap: 16px; max-width: 1176px; margin: 0 auto; padding: 0 32px 70px; }
