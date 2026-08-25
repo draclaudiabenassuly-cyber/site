@@ -218,3 +218,28 @@ O retorno deve conter as cinco imagens da galeria, o `proposalsJson` com os quat
 - A auditoria final ainda inclui o CRUD completo do CMS, o retorno da logo para
   `/` em todos os menus e a conferÃªncia dos metadados Open Graph/Twitter para
   compartilhamento no WhatsApp e nas redes sociais.
+
+## Retomada final: CMS, imagens e VLibras
+
+- Commit `03abc8d`: o menu Propostas ganhou CRUD visual para criar, editar,
+  excluir e salvar cards sem edição manual de `proposalsJson`. A logo da barra
+  lateral do CMS agora retorna para `/admin`; o link separado “Ver site público”
+  continua sendo o único atalho para a página pública.
+- O CMS foi auditado no domínio público com 91 campos, 5 fotos de galeria, 3
+  compromissos e 3 notícias. As notícias têm imagem própria por cadastro
+  (`news.image`), separada das imagens de conteúdo da Home.
+- A confusão das imagens foi documentada: a aba Home antiga renderizava toda a
+  biblioteca visual, incluindo logos, Open Graph, Santinho, História e imagens
+  reserva da galeria. As notícias padrão reutilizam três arquivos da galeria,
+  mas isso é reaproveitamento de arquivo, não sincronização entre cadastros.
+  A próxima organização visual deve separar Identidade global, Home, História,
+  Santinho, Open Graph, Galeria reserva e Notícias, explicando que fotos da
+  Galeria marcadas “Exibir na home” são as que alimentam a galeria da Home.
+- Commits `661cfa1` e `a8e283f`: o VLibras oficial ficou com um único botão. O
+  `vlibras-popup` interno duplicado foi ocultado e a propriedade CSS `translate`
+  que deslocava o painel para fora da tela foi neutralizada.
+- Deploy de produção `a8e283f` ficou Ready na Vercel. Teste no domínio
+  `www.claudiabenassuly.com.br`: 0 hosts legados `[vw]`, 1 wrapper oficial,
+  popup duplicado com `display:none`, botão em `x=16,y=513`, painel em
+  `x=76,y=16`, tamanho `380x553`, dentro da viewport `1366x585`.
+- `npm.cmd run build` passou novamente com TypeScript e 17 rotas.
