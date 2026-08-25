@@ -161,6 +161,12 @@ function pinAccessButton() {
       bottom: auto !important;
       width: 44px !important;
       height: 44px !important;
+      overflow: hidden !important;
+    }
+    #vlibras-popup {
+      display: none !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
     }
   `);
 }
@@ -181,6 +187,8 @@ function pinOpenedPanel() {
     maxHeight: "calc(100vh - 32px)",
     margin: "0",
     transform: "none",
+    animation: "none",
+    transition: "none",
     zIndex: "2147483640",
   };
   for (const [property, value] of Object.entries(panelStyle)) setImportant(host, property, value);
@@ -200,6 +208,8 @@ function pinOpenedPanel() {
       max-height: calc(100vh - 32px) !important;
       margin: 0 !important;
       transform: none !important;
+      animation: none !important;
+      transition: none !important;
       z-index: 2147483640 !important;
     }
     #vlibras-app {
