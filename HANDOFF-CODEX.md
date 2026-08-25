@@ -243,3 +243,7 @@ O retorno deve conter as cinco imagens da galeria, o `proposalsJson` com os quat
   popup duplicado com `display:none`, botão em `x=16,y=513`, painel em
   `x=76,y=16`, tamanho `380x553`, dentro da viewport `1366x585`.
 - `npm.cmd run build` passou novamente com TypeScript e 17 rotas.
+- Commit `2d57c6e`: removido da Home o protótipo público “Abrir modo gestão”.
+  Ele abria para qualquer visitante, não salvava dados e não era o CMS real.
+  A Home agora exibe somente o aviso público da agenda; a edição continua
+  exclusivamente no `/admin` autenticado.
