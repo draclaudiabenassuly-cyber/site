@@ -1543,11 +1543,11 @@ html body #vlibras-app-root {
   html body div[vw].vlibras-widget.active,
   html body div[vw][data-active="true"],
   html body #vlibras-app-root {
-    left: 76px !important;
-    bottom: 16px !important;
-    width: calc(100vw - 92px) !important;
-    height: min(560px, calc(100vh - 32px)) !important;
-    max-width: calc(100vw - 92px) !important;
-    max-height: calc(100vh - 32px) !important;
+    left: 12px !important;
+    bottom: 68px !important;
+    width: min(300px, calc(100vw - 24px)) !important;
+    height: min(420px, calc(100dvh - 96px)) !important;
+    max-width: calc(100vw - 24px) !important;
+    max-height: calc(100dvh - 96px) !important;
   }
 }

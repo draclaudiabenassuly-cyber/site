@@ -23,6 +23,7 @@ declare global {
 const WIDGET_SRC = "https://vlibras.gov.br/app";
 const SCRIPT_SRC = "https://vlibras.gov.br/app/vlibras-plugin.js";
 const SCRIPT_ID = "claudia-vlibras-script";
+let draggedPanelPosition: { left: number; top: number } | null = null;
 
 function setImportant(element: HTMLElement, property: string, value: string) {
   element.style.setProperty(property, value, "important");
@@ -60,18 +61,73 @@ function configureGlobals() {
   }
 }
 
-function pinLegacyWidget() {
-  const widget = document.querySelector<HTMLElement>("[vw]");
-  if (!widget) return;
+function isMobileViewport() {
+  return typeof window !== "undefined" && window.matchMedia("(max-width: 680px)").matches;
+}
 
-  for (const [property, value] of Object.entries({
-    position: "fixed",
-    left: "16px",
+function getPanelLayout() {
+  if (isMobileViewport()) {
+    return {
+      left: "12px",
+      right: "auto",
+      top: "auto",
+      bottom: "68px",
+      width: "min(300px, calc(100vw - 24px))",
+      maxWidth: "calc(100vw - 24px)",
+      maxHeight: "calc(100dvh - 96px)",
+      height: "min(420px, calc(100dvh - 96px))",
+    };
+  }
+
+  return {
+    left: "76px",
     right: "auto",
     top: "auto",
     bottom: "16px",
-    width: "56px",
-    height: "56px",
+    width: "min(380px, calc(100vw - 92px))",
+    maxWidth: "calc(100vw - 92px)",
+    maxHeight: "calc(100vh - 32px)",
+    height: "min(620px, calc(100vh - 32px))",
+  };
+}
+
+function clampPanelPosition(left: number, top: number, width: number, height: number) {
+  const padding = isMobileViewport() ? 8 : 12;
+  return {
+    left: Math.max(padding, Math.min(left, window.innerWidth - width - padding)),
+    top: Math.max(padding, Math.min(top, window.innerHeight - height - padding)),
+  };
+}
+
+function applyDraggedPanelPosition(element: HTMLElement) {
+  if (!draggedPanelPosition) return;
+  const rect = element.getBoundingClientRect();
+  const position = clampPanelPosition(
+    draggedPanelPosition.left,
+    draggedPanelPosition.top,
+    rect.width,
+    rect.height,
+  );
+  setImportant(element, "left", `${position.left}px`);
+  setImportant(element, "top", `${position.top}px`);
+  setImportant(element, "right", "auto");
+  setImportant(element, "bottom", "auto");
+  setImportant(element, "transform", "none");
+}
+
+function pinLegacyWidget() {
+  const widget = document.querySelector<HTMLElement>("[vw]");
+  if (!widget) return;
+  const mobile = isMobileViewport();
+
+  for (const [property, value] of Object.entries({
+    position: "fixed",
+    left: mobile ? "8px" : "16px",
+    right: "auto",
+    top: "auto",
+    bottom: mobile ? "8px" : "16px",
+    width: mobile ? "48px" : "56px",
+    height: mobile ? "48px" : "56px",
     margin: "0",
     transform: "none",
     overflow: "visible",
@@ -89,8 +145,8 @@ function pinLegacyWidget() {
       right: "auto",
       top: "0",
       bottom: "auto",
-      width: "56px",
-      height: "56px",
+      width: mobile ? "48px" : "56px",
+      height: mobile ? "48px" : "56px",
       margin: "0",
       transform: "none",
       pointerEvents: "auto",
@@ -106,10 +162,10 @@ function pinLegacyWidget() {
       right: "auto",
       top: "auto",
       bottom: "calc(100% + 12px)",
-      width: "min(380px, calc(100vw - 32px))",
-      height: "min(620px, calc(100vh - 96px))",
-      maxWidth: "calc(100vw - 32px)",
-      maxHeight: "calc(100vh - 96px)",
+      width: mobile ? "min(300px, calc(100vw - 24px))" : "min(380px, calc(100vw - 32px))",
+      height: mobile ? "min(420px, calc(100dvh - 96px))" : "min(620px, calc(100vh - 96px))",
+      maxWidth: mobile ? "calc(100vw - 24px)" : "calc(100vw - 32px)",
+      maxHeight: mobile ? "calc(100dvh - 96px)" : "calc(100vh - 96px)",
       margin: "0",
       transform: "none",
       overflow: "hidden",
@@ -122,6 +178,7 @@ function pinLegacyWidget() {
 function pinAccessButton() {
   const host = document.getElementById("vlibras-access-wrapper") as HTMLElement | null;
   if (!host) return;
+  const mobile = isMobileViewport();
 
   for (const [property, value] of Object.entries({
     position: "fixed",
@@ -129,8 +186,8 @@ function pinAccessButton() {
     right: "auto",
     top: "auto",
     bottom: "0px",
-    width: "60px",
-    height: "60px",
+    width: mobile ? "56px" : "60px",
+    height: mobile ? "56px" : "60px",
     margin: "0",
     transform: "none",
     zIndex: "2147483639",
@@ -145,9 +202,9 @@ function pinAccessButton() {
       left: 16px !important;
       right: auto !important;
       top: auto !important;
-      bottom: 16px !important;
-      width: 56px !important;
-      height: 56px !important;
+      bottom: ${mobile ? "16px" : "16px"} !important;
+      width: ${mobile ? "48px" : "56px"} !important;
+      height: ${mobile ? "48px" : "56px"} !important;
       margin: 0 !important;
       transform: none !important;
       pointer-events: auto !important;
@@ -159,8 +216,8 @@ function pinAccessButton() {
       right: auto !important;
       top: 0 !important;
       bottom: auto !important;
-      width: 44px !important;
-      height: 44px !important;
+      width: ${mobile ? "40px" : "44px"} !important;
+      height: ${mobile ? "40px" : "44px"} !important;
       overflow: hidden !important;
     }
     #vlibras-popup {
@@ -174,17 +231,11 @@ function pinAccessButton() {
 function pinOpenedPanel() {
   const host = document.getElementById("vlibras-app-root") as HTMLElement | null;
   if (!host) return;
+  const layout = getPanelLayout();
 
   const panelStyle = {
     position: "fixed",
-    left: "76px",
-    right: "auto",
-    top: "auto",
-    bottom: "16px",
-    width: "min(380px, calc(100vw - 92px))",
-    height: "min(620px, calc(100vh - 32px))",
-    maxWidth: "calc(100vw - 92px)",
-    maxHeight: "calc(100vh - 32px)",
+    ...layout,
     margin: "0",
     transform: "none",
     translate: "none",
@@ -199,14 +250,14 @@ function pinOpenedPanel() {
   addShadowStyle(root, "claudia-vlibras-panel-style", `
     :host {
       position: fixed !important;
-      left: 76px !important;
-      right: auto !important;
-      top: auto !important;
-      bottom: 16px !important;
-      width: min(380px, calc(100vw - 92px)) !important;
-      height: min(620px, calc(100vh - 32px)) !important;
-      max-width: calc(100vw - 92px) !important;
-      max-height: calc(100vh - 32px) !important;
+      left: ${layout.left} !important;
+      right: ${layout.right} !important;
+      top: ${layout.top} !important;
+      bottom: ${layout.bottom} !important;
+      width: ${layout.width} !important;
+      height: ${layout.height} !important;
+      max-width: ${layout.maxWidth} !important;
+      max-height: ${layout.maxHeight} !important;
       margin: 0 !important;
       transform: none !important;
       translate: none !important;
@@ -217,14 +268,14 @@ function pinOpenedPanel() {
     #vlibras-app {
       position: fixed !important;
       top: auto !important;
-      left: 76px !important;
-      right: auto !important;
-      bottom: 16px !important;
+      left: ${layout.left} !important;
+      right: ${layout.right} !important;
+      bottom: ${layout.bottom} !important;
       transform: none !important;
-      width: min(380px, calc(100vw - 92px)) !important;
-      height: min(620px, calc(100vh - 32px)) !important;
-      max-width: calc(100vw - 92px) !important;
-      max-height: calc(100vh - 32px) !important;
+      width: ${layout.width} !important;
+      height: ${layout.height} !important;
+      max-width: ${layout.maxWidth} !important;
+      max-height: ${layout.maxHeight} !important;
       margin: 0 !important;
       z-index: 2147483640 !important;
     }
@@ -233,18 +284,54 @@ function pinOpenedPanel() {
   const app = root.getElementById("vlibras-app") as HTMLElement | null;
   if (!app) return;
   for (const [property, value] of Object.entries(panelStyle)) setImportant(app, property, value);
+  applyDraggedPanelPosition(host);
+  applyDraggedPanelPosition(app);
+  enablePanelDragging(root, host);
+}
+
+function enablePanelDragging(root: ShadowRoot, host: HTMLElement) {
+  const handle = root.querySelector<HTMLElement>('#vlibras-app [class*="touch-none"]');
+  if (!handle || handle.dataset.claudiaDragBound === "true") return;
+
+  handle.dataset.claudiaDragBound = "true";
+  handle.style.setProperty("touch-action", "none", "important");
+  handle.style.setProperty("cursor", "move", "important");
+
+  handle.addEventListener("pointerdown", (event) => {
+    if (event.pointerType === "mouse" && event.button !== 0) return;
+
+    const rect = host.getBoundingClientRect();
+    const start = { x: event.clientX, y: event.clientY, left: rect.left, top: rect.top };
+    const onMove = (moveEvent: PointerEvent) => {
+      const position = clampPanelPosition(
+        start.left + moveEvent.clientX - start.x,
+        start.top + moveEvent.clientY - start.y,
+        rect.width,
+        rect.height,
+      );
+      draggedPanelPosition = position;
+      applyDraggedPanelPosition(host);
+      const app = root.getElementById("vlibras-app") as HTMLElement | null;
+      if (app) applyDraggedPanelPosition(app);
+      moveEvent.preventDefault();
+    };
+    const onUp = () => {
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+      window.removeEventListener("pointercancel", onUp);
+    };
+
+    window.addEventListener("pointermove", onMove, { passive: false });
+    window.addEventListener("pointerup", onUp, { once: true });
+    window.addEventListener("pointercancel", onUp, { once: true });
+    event.preventDefault();
+  }, { passive: false });
 }
 
 function pinDetachedPanels() {
   const panelStyle = {
     position: "fixed",
-    left: "76px",
-    right: "auto",
-    top: "auto",
-    bottom: "16px",
-    width: "min(380px, calc(100vw - 92px))",
-    maxWidth: "calc(100vw - 92px)",
-    maxHeight: "calc(100vh - 32px)",
+    ...getPanelLayout(),
     margin: "0",
     transform: "none",
     zIndex: "2147483640",
@@ -305,7 +392,7 @@ export default function VlibrasWidget() {
       childList: true,
       subtree: true,
       attributes: true,
-      attributeFilter: ["class", "style", "data-active", "data-expanded"],
+      attributeFilter: ["class", "data-active", "data-expanded"],
     });
     const retryTimer = window.setInterval(() => {
       injectScript();
@@ -313,6 +400,8 @@ export default function VlibrasWidget() {
       initializeWidget();
       pin();
     }, 350);
+    const onViewportChange = () => pin();
+    window.addEventListener("resize", onViewportChange);
     const stopRetryTimer = window.setTimeout(() => window.clearInterval(retryTimer), 30000);
 
     pin();
@@ -320,6 +409,7 @@ export default function VlibrasWidget() {
       observer.disconnect();
       window.clearInterval(retryTimer);
       window.clearTimeout(stopRetryTimer);
+      window.removeEventListener("resize", onViewportChange);
       script?.removeEventListener("load", onScriptLoad);
     };
   }, []);

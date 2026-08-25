@@ -1,5 +1,21 @@
 # Handoff para o Codex
 
+## Ajuste VLibras mobile e arraste - 24/08/2026
+
+- O painel oficial continua com o avatar feminino Hozana e abre encostado ao
+  botao: no desktop, `left: 76px` e `bottom: 16px`; no celular, painel de ate
+  `300x420px`, `left: 12px` e `bottom: 68px`, sem posicionamento central.
+- O painel agora pode ser movido com mouse ou toque pela area de movimento do
+  player. A posicao e limitada a viewport e recalculada ao redimensionar ou
+  girar o dispositivo.
+- O observador deixou de reagir a cada alteracao de `style`, evitando que a
+  propria correcao reescreva a posicao continuamente e reduzindo a disputa com
+  o carregamento do iframe oficial.
+- A documentacao oficial permite trocar o lado do widget pelo menu de
+  posicionamento. Mantivemos o canto inferior esquerdo ja validado na campanha
+  e adicionamos o arraste para o visitante escolher onde deixar a janela.
+- Verificacao: `npm.cmd run build` passou com TypeScript e 17 rotas.
+
 Este pacote é o código-fonte atual do site da Cláudia Benassuly. Ele está pronto
 para ser revisado e publicado no projeto Vercel/Supabase da campanha.
 
