@@ -23,6 +23,7 @@ declare global {
 const WIDGET_SRC = "https://vlibras.gov.br/app";
 const SCRIPT_SRC = "https://vlibras.gov.br/app/vlibras-plugin.js";
 const SCRIPT_ID = "claudia-vlibras-script";
+const LOCAL_PLAYER_SRC = "/api/vlibras/unity/index.html";
 let draggedPanelPosition: { left: number; top: number } | null = null;
 let preparedPanelHost: HTMLElement | null = null;
 let accessButtonInteracted = false;
@@ -278,6 +279,11 @@ function pinOpenedPanel() {
 
   const root = host.shadowRoot;
   if (!root) return;
+  const playerFrame = root.querySelector<HTMLIFrameElement>("iframe[title='vlibras-player']");
+  if (playerFrame && playerFrame.dataset.claudiaProxySrc !== "true") {
+    playerFrame.dataset.claudiaProxySrc = "true";
+    playerFrame.src = LOCAL_PLAYER_SRC;
+  }
   addShadowStyle(root, "claudia-vlibras-panel-style", `
     :host {
       display: ${isActive ? "block" : "none"} !important;
